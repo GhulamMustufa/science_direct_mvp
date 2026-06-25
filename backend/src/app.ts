@@ -11,7 +11,9 @@ import readingListsRouter from './features/reading-lists/reading-lists.routes.js
 import notificationsRouter from './features/notifications/notifications.routes.js';
 import profileRouter from './features/profile/profile.routes.js';
 import authorRouter from './features/author/author.routes.js';
+import adminRouter from './features/admin/admin.routes.js';
 import { errorHandler } from './middleware/error.js';
+
 
 
 
@@ -45,6 +47,8 @@ app.use('/api', readingListsRouter);
 app.use('/api', notificationsRouter);
 app.use('/api', profileRouter);
 app.use('/api', authorRouter);
+app.use('/api', adminRouter);
+
 
 
 
