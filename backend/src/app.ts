@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import authRouter from './features/auth/auth.routes.js';
+import { errorHandler } from './middleware/error.js';
 
 // Load environment variables
 dotenv.config();
@@ -22,7 +24,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });
 
-// Future API routes will be registered here
-// app.use('/api', apiRouter);
+// API routes
+app.use('/api/auth', authRouter);
+
+// Global error handler (must be registered after all other routes and middlewares)
+app.use(errorHandler);
 
 export default app;
