@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from './auth.service.js';
 import { registerSchema, loginSchema } from './auth.schema.js';
+import { AppError } from '../../middleware/error.js';
 
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -74,8 +75,58 @@ export class AuthController {
   };
 
   /**
+   * Handle token refresh.
+   */
+  refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        throw new AppError(401, 'Refresh token is missing', 'UNAUTHORIZED');
+      }
+
+      const result = await this.authService.refresh(refreshToken);
+      const isProduction = process.env.NODE_ENV === 'production';
+
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      });
+
+      res.status(200).json({
+        success: true,
+        data: { user: result.user },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Retrieve current authenticated user profile.
+   */
+  me = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new AppError(401, 'Authentication required', 'UNAUTHORIZED');
+      }
+
+      const user = await this.authService.getUserById(req.user.id);
+
+      res.status(200).json({
+        success: true,
+        data: { user },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * Set HTTP-only secure cookies for access and refresh tokens.
    */
+
   private setTokenCookies(
     res: Response,
     tokens: { accessToken: string; refreshToken: string }

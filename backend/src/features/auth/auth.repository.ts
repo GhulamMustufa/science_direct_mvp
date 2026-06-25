@@ -33,6 +33,25 @@ export class AuthRepository {
   }
 
   /**
+   * Find a user by their ID.
+   * Excludes soft-deleted users.
+   */
+  async findById(id: string): Promise<DbUser | null> {
+    const result = await db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.id, id),
+          isNull(users.deletedAt)
+        )
+      )
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  /**
    * Insert a new user record.
    */
   async createUser(data: CreateUserInput): Promise<DbUser> {

@@ -84,6 +84,50 @@ export class AuthService {
   }
 
   /**
+   * Refresh the access token using a valid refresh token.
+   */
+  async refresh(refreshToken: string): Promise<{ accessToken: string; user: UserResponse }> {
+    const refreshSecret = process.env.JWT_REFRESH_SECRET;
+    const accessSecret = process.env.JWT_ACCESS_SECRET;
+
+    if (!accessSecret || !refreshSecret) {
+      throw new AppError(500, 'JWT secrets are not configured in the environment', 'CONFIG_ERROR');
+    }
+
+    try {
+      const decoded = jwt.verify(refreshToken, refreshSecret) as jwt.JwtPayload & { sub: string };
+      const user = await this.authRepository.findById(decoded.sub);
+      
+      if (!user) {
+        throw new AppError(401, 'User associated with this token no longer exists', 'UNAUTHORIZED');
+      }
+
+      const sanitizedUser = this.sanitizeUser(user);
+      const accessToken = jwt.sign(
+        { sub: sanitizedUser.id, email: sanitizedUser.email, role: sanitizedUser.role },
+        accessSecret,
+        { expiresIn: '15m' }
+      );
+
+      return { accessToken, user: sanitizedUser };
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(401, 'Invalid or expired refresh token', 'UNAUTHORIZED');
+    }
+  }
+
+  /**
+   * Get user profile details by ID.
+   */
+  async getUserById(id: string): Promise<UserResponse> {
+    const user = await this.authRepository.findById(id);
+    if (!user) {
+      throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
+    }
+    return this.sanitizeUser(user);
+  }
+
+  /**
    * Remove password hash from the user object.
    */
   private sanitizeUser(user: DbUser): UserResponse {
