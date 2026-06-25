@@ -12,7 +12,9 @@ import notificationsRouter from './features/notifications/notifications.routes.j
 import profileRouter from './features/profile/profile.routes.js';
 import authorRouter from './features/author/author.routes.js';
 import adminRouter from './features/admin/admin.routes.js';
+import syncRouter from './features/sync/sync.routes.js';
 import { errorHandler } from './middleware/error.js';
+
 
 
 
@@ -48,6 +50,8 @@ app.use('/api', notificationsRouter);
 app.use('/api', profileRouter);
 app.use('/api', authorRouter);
 app.use('/api', adminRouter);
+app.use('/api', syncRouter);
+
 
 
 
