@@ -8,7 +8,9 @@ import articlesRouter from './features/articles/articles.routes.js';
 import taxonomyRouter from './features/taxonomy/taxonomy.routes.js';
 import bookmarksRouter from './features/bookmarks/bookmarks.routes.js';
 import readingListsRouter from './features/reading-lists/reading-lists.routes.js';
+import notificationsRouter from './features/notifications/notifications.routes.js';
 import { errorHandler } from './middleware/error.js';
+
 
 // Load environment variables
 dotenv.config();
@@ -36,6 +38,8 @@ app.use('/api', articlesRouter);
 app.use('/api', taxonomyRouter);
 app.use('/api', bookmarksRouter);
 app.use('/api', readingListsRouter);
+app.use('/api', notificationsRouter);
+
 
 // Global error handler (must be registered after all other routes and middlewares)
 app.use(errorHandler);
