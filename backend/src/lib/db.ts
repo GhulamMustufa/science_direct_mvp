@@ -1,3 +1,9 @@
-// Database connection setup placeholder
-// Will be initialized in step 2 with Drizzle and Supabase PostgreSQL client pool
-export const db = {};
+import { drizzle } from 'drizzle-orm/node-postgres';
+import pg from 'pg';
+import * as schema from '../db/schema/index.js';
+
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export const db = drizzle(pool, { schema });
