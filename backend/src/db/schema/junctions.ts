@@ -1,9 +1,9 @@
 import { pgTable, uuid, integer, primaryKey } from 'drizzle-orm/pg-core';
-import { articles } from './articles.js';
-import { authors } from './authors.js';
-import { categories } from './categories.js';
-import { keywords } from './keywords.js';
-import { readingLists } from './reading-lists.js';
+import { articles } from './articles';
+import { authors } from './authors';
+import { categories } from './categories';
+import { keywords } from './keywords';
+import { readingLists } from './reading-lists';
 
 export const articleAuthors = pgTable('article_authors', {
   articleId: uuid('article_id').references(() => articles.id, { onDelete: 'cascade' }).notNull(),

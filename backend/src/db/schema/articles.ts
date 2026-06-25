@@ -1,5 +1,6 @@
-import { pgTable, uuid, varchar, timestamp, customType } from 'drizzle-orm/pg-core';
-import { issues } from './issues.js';
+import { pgTable, uuid, varchar, timestamp, customType, index } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { issues } from './issues';
 
 // Custom type for PostgreSQL tsvector
 const tsvector = customType<{ data: string }>({
@@ -21,4 +22,6 @@ export const articles = pgTable('articles', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   deletedAt: timestamp('deleted_at'),
-});
+}, (table) => ({
+  searchVectorIdx: index('search_vector_idx').on(table.searchVector).using(sql`gin`),
+}));

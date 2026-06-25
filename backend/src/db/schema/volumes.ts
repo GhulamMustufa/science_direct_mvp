@@ -1,5 +1,5 @@
 import { pgTable, uuid, varchar, timestamp } from 'drizzle-orm/pg-core';
-import { journals } from './journals.js';
+import { journals } from './journals';
 
 export const volumes = pgTable('volumes', {
   id: uuid('id').primaryKey().defaultRandom(),
