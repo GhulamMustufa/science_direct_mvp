@@ -8,6 +8,13 @@
       "when": 1782380462094,
       "tag": "0000_confused_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1782394189653,
+      "tag": "0001_easy_goblin_queen",
+      "breakpoints": true
     }
   ]
 }

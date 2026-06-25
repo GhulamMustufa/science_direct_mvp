@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRouter from './features/auth/auth.routes.js';
 import journalsRouter from './features/journals/journals.routes.js';
+import articlesRouter from './features/articles/articles.routes.js';
 import { errorHandler } from './middleware/error.js';
 
 // Load environment variables
@@ -28,6 +29,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/auth', authRouter);
 app.use('/api', journalsRouter);
+app.use('/api', articlesRouter);
 
 // Global error handler (must be registered after all other routes and middlewares)
 app.use(errorHandler);

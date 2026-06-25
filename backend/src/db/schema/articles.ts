@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, customType, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, timestamp, customType, index, integer } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { issues } from './issues';
 
@@ -19,6 +19,8 @@ export const articles = pgTable('articles', {
   doi: varchar('doi', { length: 255 }).unique(),
   publishedAt: timestamp('published_at').notNull(),
   searchVector: tsvector('search_vector'),
+  views: integer('views').default(0).notNull(),
+  downloads: integer('downloads').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   deletedAt: timestamp('deleted_at'),
