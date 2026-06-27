@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { AuthProvider } from "@/features/auth/components/AuthProvider";
 import { Header } from "@/components/common/Header";
 import { Footer } from "@/components/common/Footer";
 import "./globals.css";
@@ -22,9 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-50">
-        <Header />
-        <main className="flex w-full flex-1 flex-col">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main className="flex w-full flex-1 flex-col">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
