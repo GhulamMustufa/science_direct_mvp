@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Journal, Article } from "@/types";
+import { ArticleCard } from "@/features/articles/components/ArticleCard";
 
 export const dynamic = "force-dynamic";
 
@@ -24,40 +25,6 @@ function JournalCard({ journal }: { journal: Journal }) {
   );
 }
 
-function ArticleCard({ article }: { article: Article }) {
-  const publishedDate = new Date(article.publishedAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-      <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
-        {article.journalTitle && (
-          <span className="font-medium text-blue-600 dark:text-blue-400">
-            {article.journalTitle}
-          </span>
-        )}
-        <span>•</span>
-        <span>{publishedDate}</span>
-      </div>
-      <Link href={`/articles/${article.id}`} className="mt-2 block group">
-        <h3 className="text-lg font-semibold text-zinc-900 group-hover:text-blue-600 dark:text-zinc-100 dark:group-hover:text-blue-400 transition-colors">
-          {article.title}
-        </h3>
-      </Link>
-      <p className="mt-3 line-clamp-3 text-sm text-zinc-500 dark:text-zinc-400">
-        {article.abstract}
-      </p>
-      {article.doi && (
-        <span className="mt-4 block text-xs font-mono text-zinc-400">
-          DOI: {article.doi}
-        </span>
-      )}
-    </div>
-  );
-}
 
 function HeroSection() {
   return (

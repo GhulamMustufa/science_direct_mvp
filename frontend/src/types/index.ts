@@ -86,3 +86,18 @@ export interface Bookmark {
   createdAt: string;
   article: Article;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Keyword {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+

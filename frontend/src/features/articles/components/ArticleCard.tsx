@@ -1,0 +1,70 @@
+import Link from "next/link";
+import { Article } from "@/types";
+
+export function ArticleCard({ article }: { article: Article }) {
+  const publishedDate = new Date(article.publishedAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const sortedAuthors = [...(article.authors || [])].sort(
+    (a, b) => a.authorOrder - b.authorOrder
+  );
+  
+  const authorsList = sortedAuthors
+    .map((a) => `${a.details.firstName} ${a.details.lastName}`)
+    .join(", ");
+
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
+        {article.journalTitle && (
+          <span className="font-semibold text-blue-600 dark:text-blue-400">
+            {article.journalTitle}
+          </span>
+        )}
+        {article.volumeNumber && (
+          <span>
+            Vol {article.volumeNumber}, Issue {article.issueNumber || "1"}
+          </span>
+        )}
+        <span>•</span>
+        <span>{publishedDate}</span>
+      </div>
+      <Link href={`/articles/${article.id}`} className="mt-2 block group">
+        <h3 className="text-xl font-bold text-zinc-900 group-hover:text-blue-600 dark:text-zinc-100 dark:group-hover:text-blue-400 transition-colors">
+          {article.title}
+        </h3>
+      </Link>
+      {authorsList && (
+        <p className="mt-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+          By {authorsList}
+        </p>
+      )}
+      <p className="mt-3 line-clamp-3 text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+        {article.abstract}
+      </p>
+      <div className="mt-4 flex items-center justify-between">
+        {article.doi ? (
+          <a
+            href={`https://doi.org/${article.doi}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-mono text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400"
+          >
+            DOI: {article.doi}
+          </a>
+        ) : (
+          <span />
+        )}
+        <Link
+          href={`/articles/${article.id}`}
+          className="text-sm font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400"
+        >
+          View Full Text →
+        </Link>
+      </div>
+    </div>
+  );
+}
