@@ -40,6 +40,18 @@ export interface OjsAuthor {
   orcid: string | null;
 }
 
+export interface OjsSubmission {
+  ojsSubmissionId: string;
+  title: string;
+  journalTitle: string;
+  status: 'submitted' | 'under_review' | 'revisions_required' | 'accepted' | 'rejected' | 'published';
+  submittedAt: string; // ISO date
+  lastStatusUpdate: string; // ISO date
+  ojsUrl: string;
+  authorEmail: string; // used to link submission to an author
+}
+
+
 const MOCK_JOURNALS: OjsJournal[] = [
   {
     ojsJournalId: '00000000-0000-0000-0000-000000000001',
@@ -154,6 +166,59 @@ const MOCK_AUTHORS: Record<string, OjsAuthor[]> = {
   ],
 };
 
+const MOCK_SUBMISSIONS: OjsSubmission[] = [
+  {
+    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000001',
+    title: 'Attention Mechanisms in Transformers: A Comparative Study',
+    journalTitle: 'Journal of Artificial Intelligence Research',
+    status: 'under_review',
+    submittedAt: '2026-05-10T10:00:00Z',
+    lastStatusUpdate: '2026-05-15T14:30:00Z',
+    ojsUrl: 'https://ojs.example.com/index.php/jair/submission/sub-00000001',
+    authorEmail: 'alice@example.com',
+  },
+  {
+    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000002',
+    title: 'Splicing Detection in Non-Coding RNA Sequences',
+    journalTitle: 'International Journal of Bioinformatics',
+    status: 'revisions_required',
+    submittedAt: '2026-05-20T08:00:00Z',
+    lastStatusUpdate: '2026-06-01T11:00:00Z',
+    ojsUrl: 'https://ojs.example.com/index.php/ijb/submission/sub-00000002',
+    authorEmail: 'bob@example.com',
+  },
+  {
+    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000003',
+    title: 'Zero-Shot Learning with Vision-Language Models',
+    journalTitle: 'Journal of Artificial Intelligence Research',
+    status: 'submitted',
+    submittedAt: '2026-06-15T09:00:00Z',
+    lastStatusUpdate: '2026-06-15T09:00:00Z',
+    ojsUrl: 'https://ojs.example.com/index.php/jair/submission/sub-00000003',
+    authorEmail: 'charlie@example.com',
+  },
+  {
+    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000004',
+    title: 'Single-Cell RNA Sequencing Analysis Pipelines',
+    journalTitle: 'International Journal of Bioinformatics',
+    status: 'accepted',
+    submittedAt: '2026-04-12T10:00:00Z',
+    lastStatusUpdate: '2026-05-20T16:00:00Z',
+    ojsUrl: 'https://ojs.example.com/index.php/ijb/submission/sub-00000004',
+    authorEmail: 'diana@example.com',
+  },
+  {
+    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000005',
+    title: 'Pathways of Somatic Mutation Clustering in Tumors',
+    journalTitle: 'International Journal of Bioinformatics',
+    status: 'rejected',
+    submittedAt: '2026-03-01T11:30:00Z',
+    lastStatusUpdate: '2026-04-05T09:00:00Z',
+    ojsUrl: 'https://ojs.example.com/index.php/ijb/submission/sub-00000005',
+    authorEmail: 'bob@example.com',
+  },
+];
+
 export class OjsClient {
   private isMock(): boolean {
     return OJS_BASE_URL.includes('example.com') || !OJS_API_KEY;
@@ -234,6 +299,20 @@ export class OjsClient {
     } catch (error) {
       console.warn('OJS API call failed, falling back to mock data:', error);
       return MOCK_AUTHORS[ojsArticleId] || [];
+    }
+  }
+
+  async fetchSubmissions(): Promise<OjsSubmission[]> {
+    if (this.isMock()) return MOCK_SUBMISSIONS;
+    try {
+      const res = await fetch(`${OJS_BASE_URL}/api/v1/submissions?status=queued,review,editing,published`, {
+        headers: { Authorization: `Bearer ${OJS_API_KEY}` },
+      });
+      if (!res.ok) throw new Error(`OJS returned ${res.status}`);
+      return (await res.json()) as OjsSubmission[];
+    } catch (error) {
+      console.warn('OJS API call failed, falling back to mock submissions:', error);
+      return MOCK_SUBMISSIONS;
     }
   }
 }

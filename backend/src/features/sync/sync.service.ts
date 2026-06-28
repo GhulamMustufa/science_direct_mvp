@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { OjsClient, OjsJournal, OjsVolume, OjsIssue, OjsArticle } from './ojs.client.js';
+import { OjsClient, OjsJournal, OjsVolume, OjsIssue, OjsArticle, OjsSubmission } from './ojs.client.js';
 import { SyncRepository } from './sync.repository.js';
 
 export interface SyncJob {
@@ -64,6 +64,8 @@ export class SyncService {
       for (const oj of ojsJournals) {
         await this.syncJournal(oj);
       }
+      job.progress = 'Syncing submission statuses';
+      await this.syncSubmissions();
       job.status = 'completed';
       job.completedAt = new Date();
       job.progress = 'Synchronization completed successfully';
@@ -166,5 +168,31 @@ export class SyncService {
     }
 
     await this.syncRepository.syncArticleAuthors(articleId, authorAssociations);
+  }
+
+  private async syncSubmissions(): Promise<void> {
+    const ojsSubmissions = await this.ojsClient.fetchSubmissions();
+    for (const sub of ojsSubmissions) {
+      if (!sub.authorEmail) {
+        console.warn(`Submission ${sub.ojsSubmissionId} is missing author email, skipping.`);
+        continue;
+      }
+      const author = await this.syncRepository.findAuthorByEmail(sub.authorEmail);
+      if (author) {
+        await this.syncRepository.upsertSubmission(author.id, {
+          ojsSubmissionId: sub.ojsSubmissionId,
+          title: sub.title,
+          journalTitle: sub.journalTitle,
+          status: sub.status,
+          submittedAt: new Date(sub.submittedAt),
+          lastStatusUpdate: new Date(sub.lastStatusUpdate),
+          ojsUrl: sub.ojsUrl,
+        });
+      } else {
+        console.warn(
+          `Author with email ${sub.authorEmail} not found, skipping sync of submission ${sub.ojsSubmissionId}`
+        );
+      }
+    }
   }
 }

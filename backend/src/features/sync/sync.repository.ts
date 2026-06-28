@@ -1,4 +1,4 @@
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, desc } from 'drizzle-orm';
 import { db } from '../../lib/db.js';
 import {
   journals,
@@ -8,6 +8,7 @@ import {
   authors,
   articleAuthors,
   users,
+  submissions,
 } from '../../db/schema/index.js';
 
 export type DbJournal = typeof journals.$inferSelect;
@@ -15,6 +16,7 @@ export type DbVolume = typeof volumes.$inferSelect;
 export type DbIssue = typeof issues.$inferSelect;
 export type DbArticle = typeof articles.$inferSelect;
 export type DbAuthor = typeof authors.$inferSelect;
+export type DbSubmission = typeof submissions.$inferSelect;
 
 export class SyncRepository {
   /**
@@ -273,5 +275,61 @@ export class SyncRepository {
         }))
       );
     }
+  }
+
+  async findAuthorByEmail(email: string): Promise<DbAuthor | null> {
+    const result = await db
+      .select()
+      .from(authors)
+      .where(and(eq(authors.email, email.toLowerCase().trim()), isNull(authors.deletedAt)))
+      .limit(1);
+    return result[0] || null;
+  }
+
+  async upsertSubmission(
+    authorId: string,
+    data: {
+      ojsSubmissionId: string;
+      title: string;
+      journalTitle: string;
+      status: string;
+      submittedAt: Date;
+      lastStatusUpdate: Date;
+      ojsUrl: string;
+    }
+  ): Promise<DbSubmission> {
+    const result = await db
+      .insert(submissions)
+      .values({
+        authorId,
+        ojsSubmissionId: data.ojsSubmissionId,
+        title: data.title,
+        journalTitle: data.journalTitle,
+        status: data.status,
+        submittedAt: data.submittedAt,
+        lastStatusUpdate: data.lastStatusUpdate,
+        ojsUrl: data.ojsUrl,
+      })
+      .onConflictDoUpdate({
+        target: submissions.ojsSubmissionId,
+        set: {
+          title: data.title,
+          journalTitle: data.journalTitle,
+          status: data.status,
+          lastStatusUpdate: data.lastStatusUpdate,
+          ojsUrl: data.ojsUrl,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result[0];
+  }
+
+  async findSubmissionsByAuthorId(authorId: string): Promise<DbSubmission[]> {
+    return db
+      .select()
+      .from(submissions)
+      .where(and(eq(submissions.authorId, authorId), isNull(submissions.deletedAt)))
+      .orderBy(desc(submissions.submittedAt));
   }
 }

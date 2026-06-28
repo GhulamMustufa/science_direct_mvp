@@ -1,7 +1,18 @@
 import { AuthorRepository } from './author.repository.js';
 
+export interface SubmissionResponse {
+  id: string;
+  title: string;
+  journalTitle: string | null;
+  status: 'submitted' | 'under_review' | 'revisions_required' | 'accepted' | 'rejected' | 'published';
+  submittedAt: Date;
+  lastStatusUpdate: Date | null;
+  ojsUrl: string | null;
+}
+
 export interface AuthorDashboardResponse {
   publications: any[];
+  submissions: SubmissionResponse[];
   totalViews: number;
   totalDownloads: number;
 }
@@ -17,18 +28,31 @@ export class AuthorService {
     if (!author) {
       return {
         publications: [],
+        submissions: [],
         totalViews: 0,
         totalDownloads: 0,
       };
     }
 
-    const publications = await this.authorRepository.findPublicationsByAuthorId(author.id);
+    const [publications, submissions] = await Promise.all([
+      this.authorRepository.findPublicationsByAuthorId(author.id),
+      this.authorRepository.findSubmissionsByAuthorId(author.id),
+    ]);
 
     const totalViews = publications.reduce((acc, curr) => acc + (curr.views || 0), 0);
     const totalDownloads = publications.reduce((acc, curr) => acc + (curr.downloads || 0), 0);
 
     return {
       publications,
+      submissions: submissions.map((sub) => ({
+        id: sub.id,
+        title: sub.title,
+        journalTitle: sub.journalTitle,
+        status: sub.status as SubmissionResponse['status'],
+        submittedAt: sub.submittedAt,
+        lastStatusUpdate: sub.lastStatusUpdate,
+        ojsUrl: sub.ojsUrl,
+      })),
       totalViews,
       totalDownloads,
     };
