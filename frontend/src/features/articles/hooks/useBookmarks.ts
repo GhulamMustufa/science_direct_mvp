@@ -18,8 +18,8 @@ export function useBookmarks(limit = 10) {
       const res = await articlesService.getBookmarks(page, limit);
       setBookmarks(res.bookmarks);
       setTotal(res.total);
-    } catch (err: any) {
-      setError(err.message || "Failed to load bookmarks.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to load bookmarks.");
     } finally {
       setLoading(false);
     }
@@ -36,6 +36,7 @@ export function useBookmarks(limit = 10) {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchBookmarks();
   }, [fetchBookmarks]);
 

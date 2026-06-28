@@ -7,8 +7,8 @@ import { authService } from "../services/auth.service";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (data: any) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  login: (data: Record<string, unknown>) => Promise<void>;
+  register: (data: Record<string, unknown>) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -37,12 +37,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = useCallback(async (data: any) => {
+  const login = useCallback(async (data: Record<string, unknown>) => {
     const res = await authService.login(data);
     setUser(res.user);
   }, []);
 
-  const register = useCallback(async (data: any) => {
+  const register = useCallback(async (data: Record<string, unknown>) => {
     const res = await authService.register(data);
     setUser(res.user);
   }, []);
@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshUser();
   }, [refreshUser]);
 

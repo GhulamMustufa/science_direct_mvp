@@ -7,6 +7,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useReadingLists } from "@/features/reading-lists/hooks/useReadingLists";
 import { FormField } from "@/features/auth/components/FormField";
 import { Button } from "@/components/ui/button";
+import { ReadingList } from "@/types";
 
 function CreateListForm({ onCreate }: { onCreate: (name: string, desc?: string) => Promise<void> }) {
   const [name, setName] = useState("");
@@ -40,7 +41,7 @@ function CreateListForm({ onCreate }: { onCreate: (name: string, desc?: string) 
   );
 }
 
-function ReadingListCard({ list, onDelete }: { list: any; onDelete: (id: string) => void }) {
+function ReadingListCard({ list, onDelete }: { list: ReadingList; onDelete: (id: string) => void }) {
   return (
     <div className="flex items-center justify-between p-6 rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-md transition-shadow">
       <div>

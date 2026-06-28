@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService, AuthorDashboardResponse } from "@/features/author/services/author.service";
+import { Article } from "@/types";
 
 function MetricCard({ title, value }: { title: string; value: number }) {
   return (
@@ -19,7 +20,7 @@ function MetricCard({ title, value }: { title: string; value: number }) {
   );
 }
 
-function PublicationsTable({ publications }: { publications: any[] }) {
+function PublicationsTable({ publications }: { publications: Article[] }) {
   if (publications.length === 0) {
     return (
       <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500 bg-white dark:bg-zinc-900/20">

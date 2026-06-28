@@ -1,9 +1,9 @@
 import { apiFetch, apiFetchWithMeta } from "@/lib/api";
-import { Article, Bookmark, Category, Keyword } from "@/types";
+import { Article, Bookmark, Category, Keyword, Author } from "@/types";
 
 export interface ArticleDetailResponse {
   article: Article;
-  authors: { authorOrder: number; details: any }[];
+  authors: { authorOrder: number; details: Author }[];
   categories: Category[];
   keywords: Keyword[];
 }

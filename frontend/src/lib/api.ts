@@ -11,15 +11,15 @@ export interface ApiResponse<T> {
   error?: {
     message: string;
     code: string;
-    details?: any[];
+    details?: unknown[];
   };
 }
 
 export class ApiError extends Error {
   code: string;
-  details?: any[];
+  details?: unknown[];
 
-  constructor(message: string, code: string, details?: any[]) {
+  constructor(message: string, code: string, details?: unknown[]) {
     super(message);
     this.name = 'ApiError';
     this.code = code;

@@ -33,14 +33,15 @@ export function useSearch(limit = 10) {
       });
       setArticles(res.data);
       setTotal(res.pagination?.total || 0);
-    } catch (err: any) {
-      setError(err.message || "Failed to load search results.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to load search results.");
     } finally {
       setLoading(false);
     }
   }, [query, journalId, categoryId, keyword, page, limit]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     executeSearch();
   }, [executeSearch]);
 

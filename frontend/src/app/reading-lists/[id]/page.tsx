@@ -6,8 +6,9 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { readingListsService, ReadingListDetailResponse } from "@/features/reading-lists/services/reading-lists.service";
 import { ArticleCard } from "@/features/articles/components/ArticleCard";
 import { Button } from "@/components/ui/button";
+import { ReadingList, Article } from "@/types";
 
-function ListHeader({ readingList }: { readingList: any }) {
+function ListHeader({ readingList }: { readingList: ReadingList }) {
   return (
     <div className="border-b border-zinc-200 pb-6 mb-8 dark:border-zinc-800">
       <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
@@ -24,7 +25,7 @@ function ArticleListEntry({
   article,
   onRemove,
 }: {
-  article: any;
+  article: Article;
   onRemove: (articleId: string) => Promise<void>;
 }) {
   return (
@@ -69,6 +70,7 @@ export default function ReadingListDetailPage() {
       return;
     }
     if (user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchDetail();
     }
   }, [user, authLoading, fetchDetail, router]);

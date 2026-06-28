@@ -6,8 +6,9 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useBookmarks } from "@/features/articles/hooks/useBookmarks";
 import { ArticleCard } from "@/features/articles/components/ArticleCard";
 import { Button } from "@/components/ui/button";
+import { Bookmark } from "@/types";
 
-function BookmarkListEntry({ bookmark, onRemove }: { bookmark: any; onRemove: (id: string) => void }) {
+function BookmarkListEntry({ bookmark, onRemove }: { bookmark: Bookmark; onRemove: (id: string) => void }) {
   return (
     <div className="relative group">
       <ArticleCard article={bookmark.article} />
@@ -55,7 +56,7 @@ export default function BookmarksPage() {
 
       {bookmarks.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500">
-          You haven't bookmarked any publications yet.
+          You haven&apos;t bookmarked any publications yet.
         </div>
       ) : (
         <div className="space-y-6 flex-1">

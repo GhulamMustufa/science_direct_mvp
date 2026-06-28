@@ -4,10 +4,11 @@ import { articlesService } from "@/features/articles/services/articles.service";
 import { PDFViewer } from "@/features/articles/components/PDFViewer";
 import { BookmarkButton } from "@/features/articles/components/BookmarkButton";
 import { TrackViewTrigger } from "@/features/articles/components/TrackViewTrigger";
+import { Article, Author, Category, Keyword } from "@/types";
 
 export const dynamic = "force-dynamic";
 
-function AuthorsList({ authors }: { authors: any[] }) {
+function AuthorsList({ authors }: { authors: { authorOrder: number; details: Author }[] }) {
   const sorted = [...authors].sort((a, b) => a.authorOrder - b.authorOrder);
 
   return (
@@ -34,7 +35,7 @@ function AuthorsList({ authors }: { authors: any[] }) {
   );
 }
 
-function ArticleMetadata({ article }: { article: any }) {
+function ArticleMetadata({ article }: { article: Article }) {
   const publishedDate = new Date(article.publishedAt).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -68,7 +69,7 @@ function ArticleMetadata({ article }: { article: any }) {
   );
 }
 
-function CategoryKeywords({ categories, keywords }: { categories: any[]; keywords: any[] }) {
+function CategoryKeywords({ categories, keywords }: { categories: Category[]; keywords: Keyword[] }) {
   return (
     <div className="space-y-4 py-4 border-t border-b border-zinc-100 dark:border-zinc-800">
       {categories.length > 0 && (
@@ -109,52 +110,55 @@ export default async function ArticleDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  let detail;
 
   try {
-    const { article, authors, categories, keywords } = await articlesService.getArticleDetail(id);
-    const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/articles/${id}/download`;
-
-    return (
-      <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 flex-1">
-        <TrackViewTrigger articleId={id} />
-
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-          <div className="lg:col-span-3 space-y-6">
-            <ArticleMetadata article={article} />
-            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 leading-tight">
-              {article.title}
-            </h1>
-            <AuthorsList authors={authors} />
-            
-            <CategoryKeywords categories={categories} keywords={keywords} />
-
-            <div className="py-6">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-3">Abstract</h2>
-              <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed whitespace-pre-line bg-zinc-50 p-6 rounded-xl dark:bg-zinc-900/20 border border-zinc-100 dark:border-zinc-800">
-                {article.abstract}
-              </p>
-            </div>
-
-            <PDFViewer pdfUrl={article.pdfUrl} />
-          </div>
-
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 p-6 rounded-xl border border-zinc-200 bg-white shadow-sm space-y-4 dark:border-zinc-800 dark:bg-zinc-900/50">
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Article Actions</h3>
-              <BookmarkButton articleId={id} />
-              {article.pdfUrl && (
-                <a href={downloadUrl} className="block">
-                  <button className="w-full text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-md py-2.5 shadow-sm transition-all">
-                    Download PDF Document
-                  </button>
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    detail = await articlesService.getArticleDetail(id);
   } catch {
     notFound();
   }
+
+  const { article, authors, categories, keywords } = detail;
+  const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/articles/${id}/download`;
+
+  return (
+    <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 flex-1">
+      <TrackViewTrigger articleId={id} />
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+        <div className="lg:col-span-3 space-y-6">
+          <ArticleMetadata article={article} />
+          <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 leading-tight">
+            {article.title}
+          </h1>
+          <AuthorsList authors={authors} />
+          
+          <CategoryKeywords categories={categories} keywords={keywords} />
+
+          <div className="py-6">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-3">Abstract</h2>
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed whitespace-pre-line bg-zinc-50 p-6 rounded-xl dark:bg-zinc-900/20 border border-zinc-100 dark:border-zinc-800">
+              {article.abstract}
+            </p>
+          </div>
+
+          <PDFViewer pdfUrl={article.pdfUrl} />
+        </div>
+
+        <div className="lg:col-span-1">
+          <div className="sticky top-24 p-6 rounded-xl border border-zinc-200 bg-white shadow-sm space-y-4 dark:border-zinc-800 dark:bg-zinc-900/50">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Article Actions</h3>
+            <BookmarkButton articleId={id} />
+            {article.pdfUrl && (
+              <a href={downloadUrl} className="block">
+                <button className="w-full text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-md py-2.5 shadow-sm transition-all">
+                  Download PDF Document
+                </button>
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

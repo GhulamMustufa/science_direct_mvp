@@ -18,8 +18,8 @@ export function useAdmin(limit = 10) {
       const res = await adminService.getUsers(usersPage, limit);
       setUsers(res.users);
       setTotalUsers(res.total);
-    } catch (err: any) {
-      setErrorUsers(err.message || "Failed to load users list.");
+    } catch (err: unknown) {
+      setErrorUsers((err as Error).message || "Failed to load users list.");
     } finally {
       setLoadingUsers(false);
     }
@@ -31,12 +31,13 @@ export function useAdmin(limit = 10) {
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, role: updatedUser.role } : u))
       );
-    } catch (err: any) {
-      throw new Error(err.message || "Failed to change user role.");
+    } catch (err: unknown) {
+      throw new Error((err as Error).message || "Failed to change user role.");
     }
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchUsers();
   }, [fetchUsers]);
 

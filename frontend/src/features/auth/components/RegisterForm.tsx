@@ -45,8 +45,8 @@ export function RegisterForm() {
       await register({ email, password, firstName, lastName });
       router.push("/");
       router.refresh();
-    } catch (err: any) {
-      setServerError(err.message || "Email is already registered. Please login.");
+    } catch (err: unknown) {
+      setServerError((err as Error).message || "Email is already registered. Please login.");
     } finally {
       setSubmitting(false);
     }

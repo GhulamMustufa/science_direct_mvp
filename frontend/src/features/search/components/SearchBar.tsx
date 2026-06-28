@@ -12,6 +12,7 @@ export function SearchBar() {
   const debouncedValue = useDebounce(inputValue, 300);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(query);
   }, [query]);
 

@@ -15,8 +15,8 @@ export function useReadingLists() {
     try {
       const data = await readingListsService.getReadingLists();
       setLists(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to load reading lists.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to load reading lists.");
     } finally {
       setLoading(false);
     }
@@ -26,8 +26,8 @@ export function useReadingLists() {
     try {
       const newList = await readingListsService.createReadingList(name, description);
       setLists((prev) => [...prev, newList]);
-    } catch (err: any) {
-      throw new Error(err.message || "Failed to create reading list.");
+    } catch (err: unknown) {
+      throw new Error((err as Error).message || "Failed to create reading list.");
     }
   };
 
@@ -41,6 +41,7 @@ export function useReadingLists() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLists();
   }, [fetchLists]);
 

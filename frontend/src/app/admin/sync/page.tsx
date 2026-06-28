@@ -42,6 +42,7 @@ export default function OjsSyncPage() {
 
   useEffect(() => {
     const savedJobId = localStorage.getItem("active_sync_job_id");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (savedJobId) setActiveJobId(savedJobId);
   }, []);
 
@@ -61,6 +62,7 @@ export default function OjsSyncPage() {
 
   useEffect(() => {
     if (!activeJobId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     pollJobStatus(activeJobId);
     const interval = setInterval(() => pollJobStatus(activeJobId), 2000);
     return () => clearInterval(interval);

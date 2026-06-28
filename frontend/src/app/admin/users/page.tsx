@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useAdmin } from "@/features/admin/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
+import { User, UserRole } from "@/types";
 
-function RoleModal({ user, onSave, onClose }: { user: any; onSave: (role: string) => Promise<void>; onClose: () => void }) {
-  const [selectedRole, setSelectedRole] = useState(user.role);
+function RoleModal({ user, onSave, onClose }: { user: User; onSave: (role: string) => Promise<void>; onClose: () => void }) {
+  const [selectedRole, setSelectedRole] = useState<UserRole>(user.role);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -27,7 +28,7 @@ function RoleModal({ user, onSave, onClose }: { user: any; onSave: (role: string
         <p className="text-xs text-zinc-500">Update access level for <strong className="text-zinc-700 dark:text-zinc-300">{user.email}</strong></p>
         <select
           value={selectedRole}
-          onChange={(e) => setSelectedRole(e.target.value)}
+          onChange={(e) => setSelectedRole(e.target.value as UserRole)}
           className="w-full h-10 border border-zinc-200 rounded-lg bg-white dark:bg-zinc-850 px-3 text-sm focus:outline-none dark:border-zinc-800"
         >
           {["reader", "author", "editor", "admin"].map((r) => (
@@ -45,7 +46,7 @@ function RoleModal({ user, onSave, onClose }: { user: any; onSave: (role: string
   );
 }
 
-function UserRow({ user, onEdit }: { user: any; onEdit: () => void }) {
+function UserRow({ user, onEdit }: { user: User; onEdit: () => void }) {
   const dateStr = new Date(user.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   return (
     <tr className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 text-sm">
@@ -66,7 +67,7 @@ function UserRow({ user, onEdit }: { user: any; onEdit: () => void }) {
 
 export default function UsersAdminPage() {
   const { users, totalUsers, loadingUsers, usersPage, setUsersPage, changeUserRole } = useAdmin();
-  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   if (loadingUsers) {
     return <div className="text-center py-12 text-zinc-500">Loading user catalog...</div>;

@@ -41,8 +41,8 @@ export function LoginForm() {
       await login({ email, password });
       router.push("/");
       router.refresh();
-    } catch (err: any) {
-      setServerError(err.message || "Invalid credentials. Please try again.");
+    } catch (err: unknown) {
+      setServerError((err as Error).message || "Invalid credentials. Please try again.");
     } finally {
       setSubmitting(false);
     }
