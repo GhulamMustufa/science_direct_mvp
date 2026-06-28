@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetch, apiFetchWithMeta } from "@/lib/api";
 import { Article, Bookmark, Category, Keyword } from "@/types";
 
 export interface ArticleDetailResponse {
@@ -17,6 +17,15 @@ export const articlesService = {
     await apiFetch<void>(`/articles/${id}/view`, {
       method: "POST",
     });
+  },
+
+  async getBookmarks(page = 1, limit = 10): Promise<{ bookmarks: Bookmark[]; total: number }> {
+    const offset = (page - 1) * limit;
+    const res = await apiFetchWithMeta<Bookmark[]>(`/bookmarks?limit=${limit}&offset=${offset}`);
+    return {
+      bookmarks: res.data,
+      total: res.pagination?.total || 0,
+    };
   },
 
   async addBookmark(articleId: string): Promise<void> {
