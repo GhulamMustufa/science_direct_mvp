@@ -6,6 +6,20 @@ export const authService = {
     return apiFetch<User>("/auth/me");
   },
 
+  async login(data: any): Promise<{ user: User }> {
+    return apiFetch<{ user: User }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  async register(data: any): Promise<{ user: User }> {
+    return apiFetch<{ user: User }>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
   async logout(): Promise<void> {
     await apiFetch<void>("/auth/logout", {
       method: "POST",
