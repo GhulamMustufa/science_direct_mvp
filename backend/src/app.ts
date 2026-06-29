@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import authRouter from './features/auth/auth.routes.js';
 import journalsRouter from './features/journals/journals.routes.js';
 import articlesRouter from './features/articles/articles.routes.js';
@@ -17,11 +16,6 @@ import { errorHandler } from './middleware/error.js';
 
 
 
-
-
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 
