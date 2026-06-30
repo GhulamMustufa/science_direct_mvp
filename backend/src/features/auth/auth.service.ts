@@ -71,7 +71,7 @@ export class AuthService {
     const accessToken = jwt.sign(
       { sub: user.id, email: user.email, role: user.role },
       accessSecret,
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
 
     const refreshToken = jwt.sign(
@@ -106,7 +106,7 @@ export class AuthService {
       const accessToken = jwt.sign(
         { sub: sanitizedUser.id, email: sanitizedUser.email, role: sanitizedUser.role },
         accessSecret,
-        { expiresIn: '15m' }
+        { expiresIn: '7d' }
       );
 
       return { accessToken, user: sanitizedUser };

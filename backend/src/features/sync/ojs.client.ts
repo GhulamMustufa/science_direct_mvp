@@ -220,6 +220,9 @@ const MOCK_SUBMISSIONS: OjsSubmission[] = [
 ];
 
 export class OjsClient {
+  private journalPathMap = new Map<string, string>();
+  private journalTitleMap = new Map<string, string>();
+
   private isMock(): boolean {
     return OJS_BASE_URL.includes('example.com') || !OJS_API_KEY;
   }
@@ -227,11 +230,26 @@ export class OjsClient {
   async fetchJournals(): Promise<OjsJournal[]> {
     if (this.isMock()) return MOCK_JOURNALS;
     try {
-      const res = await fetch(`${OJS_BASE_URL}/api/v1/journals`, {
+      const res = await fetch(`${OJS_BASE_URL}/index.php/index/api/v1/contexts`, {
         headers: { Authorization: `Bearer ${OJS_API_KEY}` },
       });
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      return (await res.json()) as OjsJournal[];
+      const data = await res.json();
+      
+      const journals: OjsJournal[] = [];
+      for (const item of data.items) {
+        const idStr = item.id.toString();
+        this.journalPathMap.set(idStr, item.urlPath);
+        this.journalTitleMap.set(idStr, item.name?.en || item.name || 'Untitled');
+        
+        journals.push({
+          ojsJournalId: idStr,
+          title: item.name?.en || item.name || 'Untitled',
+          description: item.description?.en || null,
+          issn: item.issn || null,
+        });
+      }
+      return journals;
     } catch (error) {
       console.warn('OJS API call failed, falling back to mock data:', error);
       return MOCK_JOURNALS;
@@ -241,11 +259,26 @@ export class OjsClient {
   async fetchVolumes(ojsJournalId: string): Promise<OjsVolume[]> {
     if (this.isMock()) return MOCK_VOLUMES[ojsJournalId] || [];
     try {
-      const res = await fetch(`${OJS_BASE_URL}/api/v1/journals/${ojsJournalId}/volumes`, {
+      const path = this.journalPathMap.get(ojsJournalId) || 'index';
+      const res = await fetch(`${OJS_BASE_URL}/index.php/${path}/api/v1/issues`, {
         headers: { Authorization: `Bearer ${OJS_API_KEY}` },
       });
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      return (await res.json()) as OjsVolume[];
+      const data = await res.json();
+      
+      const volumesMap = new Map<string, OjsVolume>();
+      for (const item of data.items) {
+        if (item.volume) {
+          const volStr = item.volume.toString();
+          if (!volumesMap.has(volStr)) {
+            volumesMap.set(volStr, {
+              volumeNumber: volStr,
+              year: (item.year || '').toString(),
+            });
+          }
+        }
+      }
+      return Array.from(volumesMap.values());
     } catch (error) {
       console.warn('OJS API call failed, falling back to mock data:', error);
       return MOCK_VOLUMES[ojsJournalId] || [];
@@ -256,12 +289,25 @@ export class OjsClient {
     const key = `${ojsJournalId}_${volumeNumber}`;
     if (this.isMock()) return MOCK_ISSUES[key] || [];
     try {
+      const path = this.journalPathMap.get(ojsJournalId) || 'index';
       const res = await fetch(
-        `${OJS_BASE_URL}/api/v1/journals/${ojsJournalId}/volumes/${volumeNumber}/issues`,
+        `${OJS_BASE_URL}/index.php/${path}/api/v1/issues`,
         { headers: { Authorization: `Bearer ${OJS_API_KEY}` } }
       );
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      return (await res.json()) as OjsIssue[];
+      const data = await res.json();
+      
+      const issues: OjsIssue[] = [];
+      for (const item of data.items) {
+        if (item.volume && item.volume.toString() === volumeNumber && item.number) {
+          issues.push({
+            issueNumber: item.number.toString(),
+            title: item.title?.en || null,
+            year: (item.year || '').toString(),
+          });
+        }
+      }
+      return issues;
     } catch (error) {
       console.warn('OJS API call failed, falling back to mock data:', error);
       return MOCK_ISSUES[key] || [];
@@ -276,12 +322,30 @@ export class OjsClient {
     const key = `${ojsJournalId}_${volumeNumber}_${issueNumber}`;
     if (this.isMock()) return MOCK_ARTICLES[key] || [];
     try {
+      const path = this.journalPathMap.get(ojsJournalId) || 'index';
+      // Fetch all published submissions
       const res = await fetch(
-        `${OJS_BASE_URL}/api/v1/journals/${ojsJournalId}/volumes/${volumeNumber}/issues/${issueNumber}/articles`,
+        `${OJS_BASE_URL}/index.php/${path}/api/v1/submissions?status=3`,
         { headers: { Authorization: `Bearer ${OJS_API_KEY}` } }
       );
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      return (await res.json()) as OjsArticle[];
+      const data = await res.json();
+      
+      const articles: OjsArticle[] = [];
+      for (const item of data.items) {
+        const pub = item.publications && item.publications.length > 0 ? item.publications[0] : null;
+        if (!pub) continue;
+        
+        articles.push({
+          ojsArticleId: item.id.toString(),
+          title: pub.title?.en || pub.title || 'Untitled',
+          abstract: pub.abstract?.en || '',
+          pdfUrl: null, // Galleys extraction requires deeper API traversal
+          doi: null,
+          publishedAt: pub.datePublished || item.dateSubmitted || new Date().toISOString(),
+        });
+      }
+      return articles;
     } catch (error) {
       console.warn('OJS API call failed, falling back to mock data:', error);
       return MOCK_ARTICLES[key] || [];
@@ -291,11 +355,32 @@ export class OjsClient {
   async fetchAuthors(ojsArticleId: string): Promise<OjsAuthor[]> {
     if (this.isMock()) return MOCK_AUTHORS[ojsArticleId] || [];
     try {
-      const res = await fetch(`${OJS_BASE_URL}/api/v1/articles/${ojsArticleId}/authors`, {
-        headers: { Authorization: `Bearer ${OJS_API_KEY}` },
-      });
-      if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      return (await res.json()) as OjsAuthor[];
+      let data = null;
+      for (const p of this.journalPathMap.values()) {
+         const res = await fetch(`${OJS_BASE_URL}/index.php/${p}/api/v1/submissions/${ojsArticleId}`, {
+           headers: { Authorization: `Bearer ${OJS_API_KEY}` },
+         });
+         if (res.ok) {
+           data = await res.json();
+           break;
+         }
+      }
+      if (!data) throw new Error('Submission not found in any context');
+      
+      const pub = data.publications && data.publications.length > 0 ? data.publications[0] : null;
+      const authors: OjsAuthor[] = [];
+      if (pub && pub.authors) {
+        for (const auth of pub.authors) {
+          authors.push({
+            firstName: auth.givenName?.en || 'Unknown',
+            lastName: auth.familyName?.en || '',
+            email: auth.email || null,
+            institution: auth.affiliation?.en || null,
+            orcid: auth.orcid || null,
+          });
+        }
+      }
+      return authors;
     } catch (error) {
       console.warn('OJS API call failed, falling back to mock data:', error);
       return MOCK_AUTHORS[ojsArticleId] || [];
@@ -305,11 +390,41 @@ export class OjsClient {
   async fetchSubmissions(): Promise<OjsSubmission[]> {
     if (this.isMock()) return MOCK_SUBMISSIONS;
     try {
-      const res = await fetch(`${OJS_BASE_URL}/api/v1/submissions?status=queued,review,editing,published`, {
-        headers: { Authorization: `Bearer ${OJS_API_KEY}` },
-      });
-      if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      return (await res.json()) as OjsSubmission[];
+      const allSubmissions: OjsSubmission[] = [];
+      for (const [id, path] of this.journalPathMap.entries()) {
+        const title = this.journalTitleMap.get(id) || 'Unknown Journal';
+        const res = await fetch(`${OJS_BASE_URL}/index.php/${path}/api/v1/submissions`, {
+          headers: { Authorization: `Bearer ${OJS_API_KEY}` },
+        });
+        if (!res.ok) continue;
+        const data = await res.json();
+        
+        for (const item of data.items) {
+          let mappedStatus: OjsSubmission['status'] = 'submitted';
+          if (item.status === 1) mappedStatus = 'submitted';
+          if (item.status === 2) mappedStatus = 'under_review';
+          if (item.status === 3) mappedStatus = 'published';
+          if (item.status === 4) mappedStatus = 'rejected';
+          
+          let authorEmail = 'unknown@example.com';
+          const pub = item.publications?.[0];
+          if (pub && pub.authors && pub.authors.length > 0) {
+            authorEmail = pub.authors[0].email || authorEmail;
+          }
+
+          allSubmissions.push({
+            ojsSubmissionId: item.id.toString(),
+            title: pub?.title?.en || pub?.title || 'Untitled',
+            journalTitle: title,
+            status: mappedStatus,
+            submittedAt: item.dateSubmitted || new Date().toISOString(),
+            lastStatusUpdate: item.lastModified || item.dateSubmitted || new Date().toISOString(),
+            ojsUrl: `${OJS_BASE_URL}/index.php/${path}/workflow/access/${item.id}`,
+            authorEmail,
+          });
+        }
+      }
+      return allSubmissions;
     } catch (error) {
       console.warn('OJS API call failed, falling back to mock submissions:', error);
       return MOCK_SUBMISSIONS;

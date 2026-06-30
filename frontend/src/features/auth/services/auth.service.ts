@@ -3,7 +3,8 @@ import { User } from "@/types";
 
 export const authService = {
   async getMe(): Promise<User> {
-    return apiFetch<User>("/auth/me");
+    const res = await apiFetch<{ user: User }>("/auth/me");
+    return res.user;
   },
 
   async login(data: Record<string, unknown>): Promise<{ user: User }> {

@@ -11,8 +11,10 @@ const tsvector = customType<{ data: string }>({
 
 export const articles = pgTable('articles', {
   id: uuid('id').primaryKey().defaultRandom(),
-  issueId: uuid('issue_id').references(() => issues.id, { onDelete: 'cascade' }).notNull(),
-  ojsArticleId: uuid('ojs_article_id').unique(),
+  issueId: uuid('issue_id')
+    .references(() => issues.id, { onDelete: 'cascade' })
+    .notNull(),
+  ojsArticleId: varchar('ojs_article_id', { length: 255 }).unique(),
   title: varchar('title', { length: 500 }).notNull(),
   abstract: varchar('abstract', { length: 4000 }).notNull(),
   pdfUrl: varchar('pdf_url', { length: 2048 }),

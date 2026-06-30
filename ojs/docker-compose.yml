@@ -1,0 +1,61 @@
+# OJS + MariaDB stack
+# Usage:
+#   docker compose up -d       start in background
+#   docker compose down        stop containers
+#   docker compose logs -f     view live logs
+#   docker compose down -v     stop AND delete all data
+#
+# After first start, open http://localhost:8080
+# DB host in OJS installer: ojs_db  (NOT localhost)
+
+services:
+
+  ojs_db:
+    image: mariadb:10.6
+    container_name: ojs_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE:      ${MYSQL_DATABASE:-ojs}
+      MYSQL_USER:          ${MYSQL_USER:-ojs}
+      MYSQL_PASSWORD:      ${MYSQL_PASSWORD:-ojspassword}
+    volumes:
+      - ojs_db_data:/var/lib/mysql
+    networks:
+      - ojs_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ojs_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ojs_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      OJS_DB_HOST:     ojs_db
+      OJS_DB_USER:     ${MYSQL_USER:-ojs}
+      OJS_DB_PASSWORD: ${MYSQL_PASSWORD:-ojspassword}
+      OJS_DB_NAME:     ${MYSQL_DATABASE:-ojs}
+    volumes:
+      - ojs_files:/var/www/html/files
+      - ojs_public:/var/www/html/public
+    depends_on:
+      ojs_db:
+        condition: service_healthy
+    networks:
+      - ojs_network
+
+volumes:
+  ojs_db_data:
+  ojs_files:
+  ojs_public:
+
+networks:
+  ojs_network:
+    driver: bridge
