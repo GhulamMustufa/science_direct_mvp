@@ -168,54 +168,44 @@ const MOCK_AUTHORS: Record<string, OjsAuthor[]> = {
 
 const MOCK_SUBMISSIONS: OjsSubmission[] = [
   {
-    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000001',
-    title: 'Attention Mechanisms in Transformers: A Comparative Study',
+    ojsSubmissionId: 'sub-001',
+    title: 'A Novel Approach to AI Ethics',
     journalTitle: 'Journal of Artificial Intelligence Research',
     status: 'under_review',
-    submittedAt: '2026-05-10T10:00:00Z',
-    lastStatusUpdate: '2026-05-15T14:30:00Z',
-    ojsUrl: 'https://ojs.example.com/index.php/jair/submission/sub-00000001',
+    submittedAt: '2026-06-20T10:00:00Z',
+    lastStatusUpdate: '2026-06-25T14:30:00Z',
+    ojsUrl: 'https://ojs.example.com/submissions/sub-001',
     authorEmail: 'alice@example.com',
   },
   {
-    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000002',
-    title: 'Splicing Detection in Non-Coding RNA Sequences',
+    ojsSubmissionId: 'sub-002',
+    title: 'Predictive Modeling for Climate Change',
     journalTitle: 'International Journal of Bioinformatics',
     status: 'revisions_required',
-    submittedAt: '2026-05-20T08:00:00Z',
-    lastStatusUpdate: '2026-06-01T11:00:00Z',
-    ojsUrl: 'https://ojs.example.com/index.php/ijb/submission/sub-00000002',
+    submittedAt: '2026-05-15T09:00:00Z',
+    lastStatusUpdate: '2026-06-10T11:00:00Z',
+    ojsUrl: 'https://ojs.example.com/submissions/sub-002',
     authorEmail: 'bob@example.com',
   },
   {
-    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000003',
-    title: 'Zero-Shot Learning with Vision-Language Models',
+    ojsSubmissionId: 'sub-003',
+    title: 'The Future of Quantum Computing',
     journalTitle: 'Journal of Artificial Intelligence Research',
     status: 'submitted',
-    submittedAt: '2026-06-15T09:00:00Z',
-    lastStatusUpdate: '2026-06-15T09:00:00Z',
-    ojsUrl: 'https://ojs.example.com/index.php/jair/submission/sub-00000003',
+    submittedAt: '2026-07-01T08:00:00Z',
+    lastStatusUpdate: '2026-07-01T08:00:00Z',
+    ojsUrl: 'https://ojs.example.com/submissions/sub-003',
     authorEmail: 'charlie@example.com',
   },
   {
-    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000004',
-    title: 'Single-Cell RNA Sequencing Analysis Pipelines',
+    ojsSubmissionId: 'sub-004',
+    title: 'Deep Learning in Genomics',
     journalTitle: 'International Journal of Bioinformatics',
     status: 'accepted',
-    submittedAt: '2026-04-12T10:00:00Z',
-    lastStatusUpdate: '2026-05-20T16:00:00Z',
-    ojsUrl: 'https://ojs.example.com/index.php/ijb/submission/sub-00000004',
+    submittedAt: '2026-03-10T12:00:00Z',
+    lastStatusUpdate: '2026-04-20T15:00:00Z',
+    ojsUrl: 'https://ojs.example.com/submissions/sub-004',
     authorEmail: 'diana@example.com',
-  },
-  {
-    ojsSubmissionId: 'sub-00000000-0000-0000-0000-000000000005',
-    title: 'Pathways of Somatic Mutation Clustering in Tumors',
-    journalTitle: 'International Journal of Bioinformatics',
-    status: 'rejected',
-    submittedAt: '2026-03-01T11:30:00Z',
-    lastStatusUpdate: '2026-04-05T09:00:00Z',
-    ojsUrl: 'https://ojs.example.com/index.php/ijb/submission/sub-00000005',
-    authorEmail: 'bob@example.com',
   },
 ];
 
@@ -234,7 +224,7 @@ export class OjsClient {
         headers: { Authorization: `Bearer ${OJS_API_KEY}` },
       });
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       
       const journals: OjsJournal[] = [];
       for (const item of data.items) {
@@ -250,8 +240,8 @@ export class OjsClient {
         });
       }
       return journals;
-    } catch (error) {
-      console.warn('OJS API call failed, falling back to mock data:', error);
+    } catch (error: any) {
+      console.warn('OJS API call failed, falling back to mock data:', error.message || error);
       return MOCK_JOURNALS;
     }
   }
@@ -264,7 +254,7 @@ export class OjsClient {
         headers: { Authorization: `Bearer ${OJS_API_KEY}` },
       });
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       
       const volumesMap = new Map<string, OjsVolume>();
       for (const item of data.items) {
@@ -279,8 +269,8 @@ export class OjsClient {
         }
       }
       return Array.from(volumesMap.values());
-    } catch (error) {
-      console.warn('OJS API call failed, falling back to mock data:', error);
+    } catch (error: any) {
+      console.warn('OJS API call failed, falling back to mock data:', error.message || error);
       return MOCK_VOLUMES[ojsJournalId] || [];
     }
   }
@@ -295,7 +285,7 @@ export class OjsClient {
         { headers: { Authorization: `Bearer ${OJS_API_KEY}` } }
       );
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       
       const issues: OjsIssue[] = [];
       for (const item of data.items) {
@@ -308,8 +298,8 @@ export class OjsClient {
         }
       }
       return issues;
-    } catch (error) {
-      console.warn('OJS API call failed, falling back to mock data:', error);
+    } catch (error: any) {
+      console.warn('OJS API call failed, falling back to mock data:', error.message || error);
       return MOCK_ISSUES[key] || [];
     }
   }
@@ -329,7 +319,7 @@ export class OjsClient {
         { headers: { Authorization: `Bearer ${OJS_API_KEY}` } }
       );
       if (!res.ok) throw new Error(`OJS returned ${res.status}`);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       
       const articles: OjsArticle[] = [];
       for (const item of data.items) {
@@ -346,8 +336,8 @@ export class OjsClient {
         });
       }
       return articles;
-    } catch (error) {
-      console.warn('OJS API call failed, falling back to mock data:', error);
+    } catch (error: any) {
+      console.warn('OJS API call failed, falling back to mock data:', error.message || error);
       return MOCK_ARTICLES[key] || [];
     }
   }
@@ -361,7 +351,7 @@ export class OjsClient {
            headers: { Authorization: `Bearer ${OJS_API_KEY}` },
          });
          if (res.ok) {
-           data = await res.json();
+           data = (await res.json()) as any;
            break;
          }
       }
@@ -381,8 +371,8 @@ export class OjsClient {
         }
       }
       return authors;
-    } catch (error) {
-      console.warn('OJS API call failed, falling back to mock data:', error);
+    } catch (error: any) {
+      console.warn('OJS API call failed, falling back to mock data:', error.message || error);
       return MOCK_AUTHORS[ojsArticleId] || [];
     }
   }
@@ -397,7 +387,7 @@ export class OjsClient {
           headers: { Authorization: `Bearer ${OJS_API_KEY}` },
         });
         if (!res.ok) continue;
-        const data = await res.json();
+        const data = (await res.json()) as any;
         
         for (const item of data.items) {
           let mappedStatus: OjsSubmission['status'] = 'submitted';
@@ -425,9 +415,45 @@ export class OjsClient {
         }
       }
       return allSubmissions;
-    } catch (error) {
-      console.warn('OJS API call failed, falling back to mock submissions:', error);
+    } catch (error: any) {
+      console.warn('OJS API call failed, falling back to mock submissions:', error.message || error);
       return MOCK_SUBMISSIONS;
+    }
+  }
+
+  async createUser(data: { email: string; firstName?: string; lastName?: string }): Promise<void> {
+    if (this.isMock()) {
+      console.log(`[Mock] Skipped OJS user creation for ${data.email}`);
+      return;
+    }
+    try {
+      // Create a secure random password for the OJS account
+      const password = Math.random().toString(36).slice(-10) + 'Aa1!';
+      
+      const payload = {
+        email: data.email,
+        givenName: data.firstName || 'Unknown',
+        familyName: data.lastName || 'User',
+        password: password,
+        username: data.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase() + Math.floor(Math.random() * 1000)
+      };
+
+      const res = await fetch(`${OJS_BASE_URL}/index.php/index/api/v1/users`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${OJS_API_KEY}` 
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) {
+        throw new Error(`OJS returned ${res.status}`);
+      }
+      console.log(`Successfully created OJS account for ${data.email}`);
+    } catch (error: any) {
+      console.warn('OJS API call failed during user creation:', error.message || error);
+      // We swallow the error so it doesn't block local registration
     }
   }
 }

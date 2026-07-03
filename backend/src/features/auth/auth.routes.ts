@@ -4,10 +4,13 @@ import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 import { authenticate } from '../../middleware/authenticate.js';
 
+import { OjsClient } from '../sync/ojs.client.js';
+
 const router = Router();
 
+const ojsClient = new OjsClient();
 const authRepository = new AuthRepository();
-const authService = new AuthService(authRepository);
+const authService = new AuthService(authRepository, ojsClient);
 const authController = new AuthController(authService);
 
 router.post('/register', authController.register);

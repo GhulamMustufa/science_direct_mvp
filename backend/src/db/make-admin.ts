@@ -35,7 +35,8 @@ async function makeAdmin() {
       console.log(`✅ Existing user "${ADMIN_EMAIL}" promoted to admin.`);
     } else {
       await db.insert(schema.users).values({
-        name: ADMIN_NAME,
+        firstName: 'Admin',
+        lastName: 'User',
         email: ADMIN_EMAIL,
         passwordHash,
         role: 'admin',

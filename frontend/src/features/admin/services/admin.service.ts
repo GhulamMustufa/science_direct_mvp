@@ -21,11 +21,11 @@ export const adminService = {
   },
 
   async changeUserRole(userId: string, role: string): Promise<User> {
-    const res = await apiFetch<{ user: User }>(`/admin/users/${userId}/role`, {
+    const res = await apiFetch<User>(`/admin/users/${userId}/role`, {
       method: "PUT",
       body: JSON.stringify({ role }),
     });
-    return res.user;
+    return res;
   },
 
   async triggerSync(): Promise<{ jobId: string; status: string }> {

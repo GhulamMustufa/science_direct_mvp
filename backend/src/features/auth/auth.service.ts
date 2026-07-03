@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { AuthRepository, DbUser } from './auth.repository.js';
 import { RegisterInput, LoginInput } from './auth.schema.js';
 import { AppError } from '../../middleware/error.js';
+import { OjsClient } from '../sync/ojs.client.js';
 
 export interface UserResponse {
   id: string;
@@ -15,7 +16,10 @@ export interface UserResponse {
 }
 
 export class AuthService {
-  constructor(private authRepository: AuthRepository) {}
+  constructor(
+    private authRepository: AuthRepository,
+    private ojsClient: OjsClient
+  ) {}
 
   /**
    * Register a new reader user.
@@ -34,7 +38,16 @@ export class AuthService {
       passwordHash,
       firstName: data.firstName,
       lastName: data.lastName,
-      role: 'reader',
+      role: data.role || 'reader',
+    });
+
+    // Fire off OJS account creation asynchronously
+    this.ojsClient.createUser({
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    }).catch(err => {
+      console.error('Failed to trigger OJS account creation:', err);
     });
 
     return this.sanitizeUser(newUser);

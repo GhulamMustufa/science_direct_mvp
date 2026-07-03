@@ -3,6 +3,7 @@ import { OjsClient } from './ojs.client.js';
 import { SyncRepository } from './sync.repository.js';
 import { SyncService } from './sync.service.js';
 import { SyncController } from './sync.controller.js';
+import { AuthRepository } from '../auth/auth.repository.js';
 import { authenticate } from '../../middleware/authenticate.js';
 import { authorize } from '../../middleware/authorize.js';
 
@@ -10,7 +11,8 @@ const router = Router();
 
 const ojsClient = new OjsClient();
 const syncRepository = new SyncRepository();
-export const syncService = new SyncService(ojsClient, syncRepository);
+const authRepository = new AuthRepository();
+export const syncService = new SyncService(ojsClient, syncRepository, authRepository);
 const syncController = new SyncController(syncService);
 
 router.post(

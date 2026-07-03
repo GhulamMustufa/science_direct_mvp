@@ -1,6 +1,8 @@
 import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 import { OjsClient, OjsJournal, OjsVolume, OjsIssue, OjsArticle, OjsSubmission } from './ojs.client.js';
 import { SyncRepository } from './sync.repository.js';
+import { AuthRepository } from '../auth/auth.repository.js';
 
 export interface SyncJob {
   id: string;
@@ -17,7 +19,8 @@ export const syncJobs = new Map<string, SyncJob>();
 export class SyncService {
   constructor(
     private ojsClient: OjsClient,
-    private syncRepository: SyncRepository
+    private syncRepository: SyncRepository,
+    private authRepository: AuthRepository
   ) {}
 
   /**
@@ -177,22 +180,43 @@ export class SyncService {
         console.warn(`Submission ${sub.ojsSubmissionId} is missing author email, skipping.`);
         continue;
       }
-      const author = await this.syncRepository.findAuthorByEmail(sub.authorEmail);
-      if (author) {
-        await this.syncRepository.upsertSubmission(author.id, {
-          ojsSubmissionId: sub.ojsSubmissionId,
-          title: sub.title,
-          journalTitle: sub.journalTitle,
-          status: sub.status,
-          submittedAt: new Date(sub.submittedAt),
-          lastStatusUpdate: new Date(sub.lastStatusUpdate),
-          ojsUrl: sub.ojsUrl,
+      let author = await this.syncRepository.findAuthorByEmail(sub.authorEmail);
+      
+      if (!author) {
+        console.log(`Author with email ${sub.authorEmail} not found, auto-creating user account.`);
+        
+        // Generate a highly secure random string for the password
+        const randomPass = crypto.randomBytes(32).toString('hex');
+        const passwordHash = await bcrypt.hash(randomPass, 10);
+        
+        // 1. Create the base user account
+        await this.authRepository.createUser({
+          email: sub.authorEmail,
+          passwordHash,
+          role: 'author',
+          firstName: sub.authorEmail.split('@')[0], // Fallback
+          lastName: 'Author'
         });
-      } else {
-        console.warn(
-          `Author with email ${sub.authorEmail} not found, skipping sync of submission ${sub.ojsSubmissionId}`
-        );
+
+        // 2. Ensure they have an author profile linked
+        author = await this.syncRepository.findOrCreateAuthor({
+          email: sub.authorEmail,
+          firstName: sub.authorEmail.split('@')[0],
+          lastName: 'Author',
+          institution: null,
+          orcid: null
+        });
       }
+
+      await this.syncRepository.upsertSubmission(author.id, {
+        ojsSubmissionId: sub.ojsSubmissionId,
+        title: sub.title,
+        journalTitle: sub.journalTitle,
+        status: sub.status,
+        submittedAt: new Date(sub.submittedAt),
+        lastStatusUpdate: new Date(sub.lastStatusUpdate),
+        ojsUrl: sub.ojsUrl,
+      });
     }
   }
 }

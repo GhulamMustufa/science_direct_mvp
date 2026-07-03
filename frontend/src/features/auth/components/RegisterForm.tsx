@@ -12,6 +12,7 @@ const registerSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters long"),
   firstName: z.string().max(100, "First name must be under 100 characters").optional(),
   lastName: z.string().max(100, "Last name must be under 100 characters").optional(),
+  role: z.enum(["reader", "author"]).optional(),
 });
 
 export function RegisterForm() {
@@ -21,6 +22,7 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [role, setRole] = useState("reader");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -30,7 +32,7 @@ export function RegisterForm() {
     setErrors({});
     setServerError(null);
 
-    const result = registerSchema.safeParse({ email, password, firstName, lastName });
+    const result = registerSchema.safeParse({ email, password, firstName, lastName, role });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.issues.forEach((err) => {
@@ -42,7 +44,7 @@ export function RegisterForm() {
 
     setSubmitting(true);
     try {
-      await register({ email, password, firstName, lastName });
+      await register({ email, password, firstName, lastName, role });
       router.push("/");
       router.refresh();
     } catch (err: unknown) {
@@ -100,6 +102,30 @@ export function RegisterForm() {
         disabled={submitting}
         required
       />
+
+      <div className="space-y-1.5 w-full">
+        <label
+          htmlFor="role"
+          className="text-xs font-bold text-zinc-500 uppercase tracking-wider dark:text-zinc-400"
+        >
+          Account Role
+        </label>
+        <select
+          id="role"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          disabled={submitting}
+          className="h-11 w-full rounded-lg border px-4 text-sm bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+        >
+          <option value="reader">Reader</option>
+          <option value="author">Author</option>
+        </select>
+        {errors.role && (
+          <span className="text-xs font-semibold text-red-500 block">
+            {errors.role}
+          </span>
+        )}
+      </div>
 
       <Button
         type="submit"
