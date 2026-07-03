@@ -14,7 +14,7 @@ const authorController = new AuthorController(authorService);
 router.get(
   '/author/dashboard',
   authenticate,
-  authorize(['author', 'editor', 'admin']),
+  authorize(['author', 'admin']),
   authorController.getDashboard
 );
 

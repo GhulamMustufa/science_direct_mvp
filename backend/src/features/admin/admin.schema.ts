@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const changeRoleSchema = z.object({
-  role: z.enum(['reader', 'author', 'editor', 'admin'], {
-    errorMap: () => ({ message: "Role must be 'reader', 'author', 'editor', or 'admin'" }),
+  role: z.enum(['reader', 'author', 'admin'], {
+    errorMap: () => ({ message: "Role must be 'reader', 'author', or 'admin'" }),
   }),
 });
 

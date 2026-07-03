@@ -421,14 +421,14 @@ export class OjsClient {
     }
   }
 
-  async createUser(data: { email: string; firstName?: string; lastName?: string }): Promise<void> {
+  async createUser(data: { email: string; firstName?: string; lastName?: string; password?: string }): Promise<void> {
     if (this.isMock()) {
       console.log(`[Mock] Skipped OJS user creation for ${data.email}`);
       return;
     }
     try {
-      // Create a secure random password for the OJS account
-      const password = Math.random().toString(36).slice(-10) + 'Aa1!';
+      // Use provided password or fallback to secure random string
+      const password = data.password || (Math.random().toString(36).slice(-10) + 'Aa1!');
       
       const payload = {
         email: data.email,

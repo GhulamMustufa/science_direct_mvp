@@ -58,7 +58,7 @@ export class AdminRepository {
    */
   async updateUserRole(
     id: string,
-    role: 'reader' | 'author' | 'editor' | 'admin'
+    role: 'reader' | 'author' | 'admin'
   ): Promise<Omit<DbUser, 'passwordHash'>> {
     const result = await db
       .update(users)

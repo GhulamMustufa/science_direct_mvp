@@ -5,7 +5,7 @@ import { AppError } from './error.js';
 export interface UserPayload {
   id: string;
   email: string;
-  role: 'reader' | 'author' | 'editor' | 'admin';
+  role: 'reader' | 'author' | 'admin';
 }
 
 declare global {
@@ -32,7 +32,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     const decoded = jwt.verify(token, accessSecret) as jwt.JwtPayload & {
       sub: string;
       email: string;
-      role: 'reader' | 'author' | 'editor' | 'admin';
+      role: 'reader' | 'author' | 'admin';
     };
 
     req.user = {

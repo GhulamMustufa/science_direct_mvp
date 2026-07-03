@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from './error.js';
 
-type UserRole = 'reader' | 'author' | 'editor' | 'admin';
+type UserRole = 'reader' | 'author' | 'admin';
 
 export const authorize = (allowedRoles: UserRole[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {

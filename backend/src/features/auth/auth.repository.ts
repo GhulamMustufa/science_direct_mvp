@@ -7,7 +7,7 @@ export interface CreateUserInput {
   passwordHash: string;
   firstName?: string;
   lastName?: string;
-  role?: 'reader' | 'author' | 'editor' | 'admin';
+  role?: 'reader' | 'author' | 'admin';
 }
 
 export type DbUser = typeof users.$inferSelect;

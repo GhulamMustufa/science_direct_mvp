@@ -5,7 +5,7 @@ import { AppError } from '../../middleware/error.js';
 export interface ProfileResponse {
   id: string;
   email: string;
-  role: 'reader' | 'author' | 'editor' | 'admin';
+  role: 'reader' | 'author' | 'admin';
   firstName: string | null;
   lastName: string | null;
   createdAt: Date;
@@ -29,7 +29,7 @@ export class ProfileService {
     return {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as 'reader' | 'author' | 'admin',
       firstName: user.firstName,
       lastName: user.lastName,
       createdAt: user.createdAt,

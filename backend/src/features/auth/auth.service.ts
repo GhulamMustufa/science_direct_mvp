@@ -8,7 +8,7 @@ import { OjsClient } from '../sync/ojs.client.js';
 export interface UserResponse {
   id: string;
   email: string;
-  role: 'reader' | 'author' | 'editor' | 'admin';
+  role: 'reader' | 'author' | 'admin';
   firstName: string | null;
   lastName: string | null;
   createdAt: Date;
@@ -33,12 +33,18 @@ export class AuthService {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(data.password, saltRounds);
 
+    // Bootstrap first admin check
+    const initialAdminEmail = process.env.INITIAL_ADMIN_EMAIL?.toLowerCase().trim();
+    const isInitialAdmin = initialAdminEmail && data.email.toLowerCase().trim() === initialAdminEmail;
+    
+    const assignedRole = isInitialAdmin ? 'admin' : (data.role || 'reader');
+
     const newUser = await this.authRepository.createUser({
       email: data.email,
       passwordHash,
       firstName: data.firstName,
       lastName: data.lastName,
-      role: data.role || 'reader',
+      role: assignedRole,
     });
 
     // Fire off OJS account creation asynchronously
@@ -46,6 +52,7 @@ export class AuthService {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
+      password: data.password,
     }).catch(err => {
       console.error('Failed to trigger OJS account creation:', err);
     });
@@ -147,7 +154,7 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as 'reader' | 'author' | 'admin',
       firstName: user.firstName,
       lastName: user.lastName,
       createdAt: user.createdAt,

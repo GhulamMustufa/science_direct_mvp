@@ -19,7 +19,7 @@ export class AdminService {
    */
   async changeUserRole(
     id: string,
-    role: 'reader' | 'author' | 'editor' | 'admin'
+    role: 'reader' | 'author' | 'admin'
   ): Promise<Omit<DbUser, 'passwordHash'>> {
     const user = await this.adminRepository.findUserById(id);
     if (!user) {
