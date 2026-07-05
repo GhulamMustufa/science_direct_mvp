@@ -122,11 +122,46 @@ export class ArticlesController {
         downloadUrl = downloadUrl.replace('/article/view/', '/article/download/');
       }
 
-      const pdfRes = await fetch(downloadUrl);
+      let pdfRes = await fetch(downloadUrl);
+      let contentType = pdfRes.headers.get('content-type') || '';
+
+      // If OJS returned the HTML viewer (which happens if plugins intercept /download/ or if it requires a fileId),
+      // we must parse the HTML to extract the actual raw file download link.
+      if (contentType.includes('text/html')) {
+         const html = await pdfRes.text();
+         
+         // 1. Try to find the direct file download link (contains 3 ID parts: articleId/galleyId/fileId)
+         let match = html.match(/href="([^"]+\/article\/download\/\d+\/\d+\/\d+[^"]*)"/i);
+         
+         // 2. Fallback: look for a download button link
+         if (!match) {
+             match = html.match(/class="[^"]*download[^"]*"[^>]*href="([^"]+)"/i);
+         }
+         
+         // 3. Fallback: look for pdf.js file param
+         if (!match) {
+             const fileMatch = html.match(/file=([^"&]+)/i);
+             if (fileMatch) match = [fileMatch[0], decodeURIComponent(fileMatch[1])];
+         }
+
+         if (match && match[1]) {
+             let finalUrl = match[1];
+             // Make absolute if relative
+             if (finalUrl.startsWith('/')) {
+                 const urlObj = new URL(downloadUrl);
+                 finalUrl = urlObj.origin + finalUrl;
+             }
+             pdfRes = await fetch(finalUrl);
+             contentType = pdfRes.headers.get('content-type') || '';
+         } else {
+             throw new Error("Could not extract raw PDF link from OJS viewer HTML");
+         }
+      }
+
       if (!pdfRes.ok) throw new Error('Failed to fetch PDF from OJS');
 
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'inline; filename="article.pdf"'); // Force inline display
+      res.setHeader('Content-Type', contentType.includes('pdf') ? 'application/pdf' : contentType);
+      res.setHeader('Content-Disposition', 'inline; filename="article.pdf"'); 
       
       const arrayBuffer = await pdfRes.arrayBuffer();
       res.send(Buffer.from(arrayBuffer));
