@@ -111,12 +111,12 @@ export class ArticlesController {
       const { id } = req.params;
       const article = await this.articlesService.getArticleDetail(id);
       
-      if (!article || !article.pdfUrl) {
+      if (!article || !article.article.pdfUrl) {
          res.status(404).send('PDF not found');
          return;
       }
       
-      let downloadUrl = article.pdfUrl;
+      let downloadUrl = article.article.pdfUrl;
       // Convert OJS view URL to download URL to get raw file stream instead of the OJS HTML wrapper
       if (downloadUrl.includes('/article/view/')) {
         downloadUrl = downloadUrl.replace('/article/view/', '/article/download/');
