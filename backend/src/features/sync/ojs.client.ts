@@ -95,7 +95,7 @@ const MOCK_ARTICLES: Record<string, OjsArticle[]> = {
       ojsArticleId: '11111111-1111-1111-1111-111111111111',
       title: 'Deep Learning for Natural Language Processing',
       abstract: 'This paper discusses the advancements in NLP using deep neural networks...',
-      pdfUrl: 'https://firebasestorage.googleapis.com/v0/b/mock/o/nlp.pdf',
+      pdfUrl: 'https://ojs.example.com/index.php/jair/article/view/11111111-1111-1111-1111-111111111111/1',
       doi: '10.1016/j.jair.2025.01.001',
       publishedAt: '2025-01-15T09:00:00Z',
     },
@@ -105,7 +105,7 @@ const MOCK_ARTICLES: Record<string, OjsArticle[]> = {
       ojsArticleId: '11111111-1111-1111-1111-111111111112',
       title: 'Reinforcement Learning in Robotics',
       abstract: 'A comprehensive study on model-free RL algorithms for robot manipulation tasks.',
-      pdfUrl: 'https://firebasestorage.googleapis.com/v0/b/mock/o/robotics.pdf',
+      pdfUrl: 'https://ojs.example.com/index.php/jair/article/view/11111111-1111-1111-1111-111111111112/2',
       doi: '10.1016/j.jair.2026.02.005',
       publishedAt: '2026-02-20T10:00:00Z',
     },
@@ -115,7 +115,7 @@ const MOCK_ARTICLES: Record<string, OjsArticle[]> = {
       ojsArticleId: '22222222-2222-2222-2222-222222222221',
       title: 'Genome-wide Association Studies of Disease',
       abstract: 'We identify key genetic variants associated with type-2 diabetes in a cohort of 50,000...',
-      pdfUrl: 'https://firebasestorage.googleapis.com/v0/b/mock/o/gwas.pdf',
+      pdfUrl: 'https://ojs.example.com/index.php/ijb/article/view/22222222-2222-2222-2222-222222222221/1',
       doi: '10.1016/j.ijb.2024.03.012',
       publishedAt: '2024-03-10T08:00:00Z',
     },
@@ -326,12 +326,27 @@ export class OjsClient {
         const pub = item.publications && item.publications.length > 0 ? item.publications[0] : null;
         if (!pub) continue;
         
+        let pdfUrl: string | null = null;
+        if (pub.galleys && Array.isArray(pub.galleys)) {
+          const pdfGalley = pub.galleys.find((g: any) => 
+            (g.label || '').toLowerCase().includes('pdf') || 
+            (g.file?.mimetype || '').toLowerCase().includes('pdf') ||
+            (g.fileType || '').toLowerCase().includes('pdf')
+          );
+          if (pdfGalley) {
+            pdfUrl = pdfGalley.urlPublished || pdfGalley.urlRemote || null;
+            if (!pdfUrl && pdfGalley.id) {
+               pdfUrl = `${OJS_BASE_URL}/index.php/${path}/article/view/${item.id}/${pdfGalley.id}`;
+            }
+          }
+        }
+        
         articles.push({
           ojsArticleId: item.id.toString(),
           title: pub.title?.en || pub.title || 'Untitled',
           abstract: pub.abstract?.en || '',
-          pdfUrl: null, // Galleys extraction requires deeper API traversal
-          doi: null,
+          pdfUrl,
+          doi: pub.doi || null,
           publishedAt: pub.datePublished || item.dateSubmitted || new Date().toISOString(),
         });
       }
