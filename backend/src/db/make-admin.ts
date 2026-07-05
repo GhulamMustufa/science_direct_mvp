@@ -38,7 +38,6 @@ async function makeAdmin() {
         firstName: 'Admin',
         lastName: 'User',
         email: ADMIN_EMAIL,
-        passwordHash,
         role: 'admin',
       });
       console.log(`✅ New admin user created: ${ADMIN_EMAIL}`);
@@ -46,7 +45,6 @@ async function makeAdmin() {
 
     console.log(`\nLogin credentials:`);
     console.log(`  Email:    ${ADMIN_EMAIL}`);
-    console.log(`  Password: ${ADMIN_PASSWORD}`);
     console.log(`  Use POST /api/auth/login to get your token.\n`);
   } catch (err) {
     console.error('Error:', err);

@@ -1,30 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from './auth.service.js';
-import { registerSchema, loginSchema } from './auth.schema.js';
+import { loginSchema } from './auth.schema.js';
 import { AppError } from '../../middleware/error.js';
 
 export class AuthController {
   constructor(private authService: AuthService) {}
-
-  /**
-   * Handle user registration.
-   */
-  register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const input = registerSchema.parse(req.body);
-      const user = await this.authService.register(input);
-      const tokens = this.authService.generateTokens(user);
-
-      this.setTokenCookies(res, tokens);
-
-      res.status(201).json({
-        success: true,
-        data: { user },
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
 
   /**
    * Handle user login.

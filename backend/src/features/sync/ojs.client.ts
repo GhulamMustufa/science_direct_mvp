@@ -209,6 +209,24 @@ const MOCK_SUBMISSIONS: OjsSubmission[] = [
   },
 ];
 
+const MOCK_ALL_USERS: any[] = [
+  {
+    email: 'admin@example.com',
+    firstName: 'Admin',
+    lastName: 'User',
+    role: 'admin',
+    password: 'Password123!'
+  },
+  {
+    email: 'author@example.com',
+    firstName: 'Author',
+    lastName: 'User',
+    role: 'author',
+    password: 'Password123!'
+  }
+];
+
+
 export class OjsClient {
   private journalPathMap = new Map<string, string>();
   private journalTitleMap = new Map<string, string>();
@@ -436,39 +454,52 @@ export class OjsClient {
     }
   }
 
-  async createUser(data: { email: string; firstName?: string; lastName?: string; password?: string }): Promise<void> {
+  async authenticateUser(email: string, password: string): Promise<any | null> {
     if (this.isMock()) {
-      console.log(`[Mock] Skipped OJS user creation for ${data.email}`);
-      return;
+      const u = MOCK_ALL_USERS.find(u => u.email === email && u.password === password);
+      return u ? { ...u } : null;
     }
     try {
-      // Use provided password or fallback to secure random string
-      const password = data.password || (Math.random().toString(36).slice(-10) + 'Aa1!');
-      
-      const payload = {
-        email: data.email,
-        givenName: data.firstName || 'Unknown',
-        familyName: data.lastName || 'User',
-        password: password,
-        username: data.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase() + Math.floor(Math.random() * 1000)
-      };
-
-      const res = await fetch(`${OJS_BASE_URL}/index.php/index/api/v1/users`, {
+      const res = await fetch(`${OJS_BASE_URL}/index.php/index/api/v1/users/login`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${OJS_API_KEY}` 
-        },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: email, password })
       });
+      if (!res.ok) return null;
+      const data = (await res.json()) as any;
       
-      if (!res.ok) {
-        throw new Error(`OJS returned ${res.status}`);
-      }
-      console.log(`Successfully created OJS account for ${data.email}`);
-    } catch (error: any) {
-      console.warn('OJS API call failed during user creation:', error.message || error);
-      // We swallow the error so it doesn't block local registration
+      // We would ideally fetch the full profile here to get role IDs,
+      // but for this MVP, we parse from login response or default to author.
+      return {
+        email,
+        firstName: data.givenName?.en || 'Unknown',
+        lastName: data.familyName?.en || 'User',
+        role: 'author', 
+      };
+    } catch (e) {
+      console.error('OJS proxy login failed:', e);
+      return null;
+    }
+  }
+
+  async fetchAllUsers(): Promise<any[]> {
+    if (this.isMock()) return MOCK_ALL_USERS;
+    try {
+      const res = await fetch(`${OJS_BASE_URL}/index.php/index/api/v1/users`, {
+        headers: { Authorization: `Bearer ${OJS_API_KEY}` }
+      });
+      if (!res.ok) return [];
+      const data = (await res.json()) as any;
+      return data.items.map((item: any) => ({
+        email: item.email,
+        firstName: item.givenName?.en || 'Unknown',
+        lastName: item.familyName?.en || '',
+        // Role ID 1 = Site Admin, 16 = Journal Manager
+        role: (item.groups && item.groups.some((g: any) => g.roleId === 1 || g.roleId === 16)) ? 'admin' : 'author'
+      }));
+    } catch (e) {
+      console.warn('OJS API call failed fetching all users:', e);
+      return [];
     }
   }
 }

@@ -57,8 +57,8 @@ function UserRow({ user, onEdit }: { user: User; onEdit: () => void }) {
       <td className="px-6 py-4 font-medium capitalize text-zinc-700 dark:text-zinc-300">{user.role}</td>
       <td className="px-6 py-4 text-zinc-400">{dateStr}</td>
       <td className="px-6 py-4 text-right">
-        <Button variant="ghost" size="sm" onClick={onEdit} className="text-xs text-blue-650 hover:bg-blue-50/70 dark:hover:bg-blue-950/20">
-          Change Role
+        <Button variant="ghost" size="sm" disabled className="text-xs text-zinc-400">
+          Managed in OJS
         </Button>
       </td>
     </tr>

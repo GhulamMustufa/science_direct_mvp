@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { AuthRepository, DbUser } from './auth.repository.js';
-import { RegisterInput, LoginInput } from './auth.schema.js';
+import { LoginInput } from './auth.schema.js';
 import { AppError } from '../../middleware/error.js';
 import { OjsClient } from '../sync/ojs.client.js';
 
@@ -22,59 +22,30 @@ export class AuthService {
   ) {}
 
   /**
-   * Register a new reader user.
-   */
-  async register(data: RegisterInput): Promise<UserResponse> {
-    const existingUser = await this.authRepository.findByEmail(data.email);
-    if (existingUser) {
-      throw new AppError(409, 'Email address is already in use', 'EMAIL_ALREADY_EXISTS');
-    }
-
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(data.password, saltRounds);
-
-    // Bootstrap first admin check
-    const initialAdminEmail = process.env.INITIAL_ADMIN_EMAIL?.toLowerCase().trim();
-    const isInitialAdmin = initialAdminEmail && data.email.toLowerCase().trim() === initialAdminEmail;
-    
-    const assignedRole = isInitialAdmin ? 'admin' : (data.role || 'reader');
-
-    const newUser = await this.authRepository.createUser({
-      email: data.email,
-      passwordHash,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      role: assignedRole,
-    });
-
-    // Fire off OJS account creation asynchronously
-    this.ojsClient.createUser({
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      password: data.password,
-    }).catch(err => {
-      console.error('Failed to trigger OJS account creation:', err);
-    });
-
-    return this.sanitizeUser(newUser);
-  }
-
-  /**
-   * Authenticate user credentials.
+   * Authenticate user credentials against OJS API directly.
    */
   async login(data: LoginInput): Promise<UserResponse> {
-    const user = await this.authRepository.findByEmail(data.email);
-    if (!user) {
+    // 1. Authenticate with OJS Master Identity Provider
+    const ojsUser = await this.ojsClient.authenticateUser(data.email, data.password);
+    
+    if (!ojsUser) {
       throw new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
-    const isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
-    if (!isPasswordValid) {
-      throw new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
+    // 2. Ensure the user exists in our local database mirror
+    let localUser = await this.authRepository.findByEmail(data.email);
+    
+    if (!localUser) {
+      // First time logging in from OJS, create a shadow profile
+      localUser = await this.authRepository.createUser({
+        email: data.email,
+        firstName: ojsUser.firstName,
+        lastName: ojsUser.lastName,
+        role: ojsUser.role || 'author', // Default to author if missing
+      });
     }
 
-    return this.sanitizeUser(user);
+    return this.sanitizeUser(localUser);
   }
 
   /**

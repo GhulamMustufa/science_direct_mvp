@@ -11,12 +11,12 @@ export default function LoginPage() {
           </h2>
           <p className="mt-2 text-sm text-zinc-500">
             Or{" "}
-            <Link
-              href="/register"
+            <a
+              href={process.env.NEXT_PUBLIC_OJS_BASE_URL ? `${process.env.NEXT_PUBLIC_OJS_BASE_URL}/index.php/index/user/register` : "#"}
               className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
-              create a new account
-            </Link>
+              create a new account on OJS
+            </a>
           </p>
         </div>
         <LoginForm />

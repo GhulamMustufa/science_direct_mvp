@@ -67,6 +67,8 @@ export class SyncService {
       for (const oj of ojsJournals) {
         await this.syncJournal(oj);
       }
+      job.progress = 'Syncing users';
+      await this.syncUsers();
       job.progress = 'Syncing submission statuses';
       await this.syncSubmissions();
       job.status = 'completed';
@@ -185,18 +187,16 @@ export class SyncService {
       if (!author) {
         console.log(`Author with email ${sub.authorEmail} not found, auto-creating user account.`);
         
-        // Generate a highly secure random string for the password
-        const randomPass = crypto.randomBytes(32).toString('hex');
-        const passwordHash = await bcrypt.hash(randomPass, 10);
-        
         // 1. Create the base user account
-        await this.authRepository.createUser({
-          email: sub.authorEmail,
-          passwordHash,
-          role: 'author',
-          firstName: sub.authorEmail.split('@')[0], // Fallback
-          lastName: 'Author'
-        });
+        const existingUser = await this.authRepository.findByEmail(sub.authorEmail);
+        if (!existingUser) {
+          await this.authRepository.createUser({
+            email: sub.authorEmail,
+            role: 'author',
+            firstName: sub.authorEmail.split('@')[0], // Fallback
+            lastName: 'Author'
+          });
+        }
 
         // 2. Ensure they have an author profile linked
         author = await this.syncRepository.findOrCreateAuthor({
@@ -217,6 +217,25 @@ export class SyncService {
         lastStatusUpdate: new Date(sub.lastStatusUpdate),
         ojsUrl: sub.ojsUrl,
       });
+    }
+  }
+
+  private async syncUsers(): Promise<void> {
+    const ojsUsers = await this.ojsClient.fetchAllUsers();
+    for (const u of ojsUsers) {
+      if (!u.email) continue;
+      
+      const existingUser = await this.authRepository.findByEmail(u.email);
+      if (!existingUser) {
+        await this.authRepository.createUser({
+          email: u.email,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          role: u.role || 'author'
+        });
+      }
+      // Note: In a production MVP we might also want an update function here 
+      // if their role changed to admin. For now, creating shadow accounts is sufficient.
     }
   }
 }
