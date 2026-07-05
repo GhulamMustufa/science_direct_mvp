@@ -6,8 +6,6 @@ import { JournalCard } from "@/features/journals/components/JournalCard";
 
 export const dynamic = "force-dynamic";
 
-
-
 function HeroSection() {
   return (
     <section className="relative w-full overflow-hidden bg-gradient-to-b from-blue-50/50 via-white to-zinc-50 py-20 dark:from-zinc-950/20 dark:via-zinc-950 dark:to-zinc-950">
