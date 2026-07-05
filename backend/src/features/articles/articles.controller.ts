@@ -102,4 +102,36 @@ export class ArticlesController {
       next(error);
     }
   };
+
+  /**
+   * Proxy the PDF to bypass OJS X-Frame-Options and force inline display in the iframe.
+   */
+  streamPdf = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const article = await this.articlesService.getArticleDetail(id);
+      
+      if (!article || !article.pdfUrl) {
+         res.status(404).send('PDF not found');
+         return;
+      }
+      
+      let downloadUrl = article.pdfUrl;
+      // Convert OJS view URL to download URL to get raw file stream instead of the OJS HTML wrapper
+      if (downloadUrl.includes('/article/view/')) {
+        downloadUrl = downloadUrl.replace('/article/view/', '/article/download/');
+      }
+
+      const pdfRes = await fetch(downloadUrl);
+      if (!pdfRes.ok) throw new Error('Failed to fetch PDF from OJS');
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline; filename="article.pdf"'); // Force inline display
+      
+      const arrayBuffer = await pdfRes.arrayBuffer();
+      res.send(Buffer.from(arrayBuffer));
+    } catch (error) {
+      next(error);
+    }
+  };
 }

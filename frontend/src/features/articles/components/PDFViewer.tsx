@@ -1,8 +1,9 @@
 interface PDFViewerProps {
+  articleId: string;
   pdfUrl?: string | null;
 }
 
-export function PDFViewer({ pdfUrl }: PDFViewerProps) {
+export function PDFViewer({ articleId, pdfUrl }: PDFViewerProps) {
   if (!pdfUrl) {
     return (
       <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950">
@@ -18,7 +19,7 @@ export function PDFViewer({ pdfUrl }: PDFViewerProps) {
         <span>Interactive Frame</span>
       </div>
       <iframe
-        src={pdfUrl}
+        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/articles/${articleId}/pdf`}
         title="PDF Reader"
         className="h-[650px] w-full rounded-lg border border-zinc-100 dark:border-zinc-800"
       />

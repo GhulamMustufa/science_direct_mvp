@@ -87,7 +87,8 @@ export class SyncService {
   private async syncJournal(oj: OjsJournal): Promise<void> {
     const journal = await this.syncRepository.upsertJournal(oj);
     const volumes = await this.ojsClient.fetchVolumes(oj.ojsJournalId);
-    
+    console.log(`[Sync Engine] Fetched ${volumes.length} volumes from OJS:`);
+
     for (const v of volumes) {
       await this.syncVolume(journal.id, oj.ojsJournalId, v);
     }
@@ -177,6 +178,8 @@ export class SyncService {
 
   private async syncSubmissions(): Promise<void> {
     const ojsSubmissions = await this.ojsClient.fetchSubmissions();
+    console.log(`[Sync Engine] Fetched ${ojsSubmissions.length} submissions from OJS:`);
+
     for (const sub of ojsSubmissions) {
       if (!sub.authorEmail) {
         console.warn(`Submission ${sub.ojsSubmissionId} is missing author email, skipping.`);
@@ -222,6 +225,8 @@ export class SyncService {
 
   private async syncUsers(): Promise<void> {
     const ojsUsers = await this.ojsClient.fetchAllUsers();
+    console.log(`[Sync Engine] Fetched ${ojsUsers.length} users from OJS:`);
+    
     for (const u of ojsUsers) {
       if (!u.email) continue;
       

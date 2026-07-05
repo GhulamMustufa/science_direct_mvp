@@ -455,27 +455,46 @@ export class OjsClient {
   }
 
   async authenticateUser(email: string, password: string): Promise<any | null> {
-    if (this.isMock()) {
-      const u = MOCK_ALL_USERS.find(u => u.email === email && u.password === password);
-      return u ? { ...u } : null;
-    }
+    if (this.isMock()) return { email, id: 'mock-id' };
+    
     try {
-      const res = await fetch(`${OJS_BASE_URL}/index.php/index/api/v1/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email, password })
-      });
-      if (!res.ok) return null;
-      const data = (await res.json()) as any;
+      // 1. Fetch the login page to get the CSRF token and Session cookie
+      const res1 = await fetch(`${OJS_BASE_URL}/index.php/index/login`);
+      const html = await res1.text();
+      const cookies = res1.headers.get('set-cookie');
       
-      // We would ideally fetch the full profile here to get role IDs,
-      // but for this MVP, we parse from login response or default to author.
-      return {
-        email,
-        firstName: data.givenName?.en || 'Unknown',
-        lastName: data.familyName?.en || 'User',
-        role: 'author', 
-      };
+      const match = html.match(/name="csrfToken" value="([^"]+)"/);
+      if (!match || !cookies) {
+        console.error('OJS proxy login failed: Could not find CSRF token or session cookie');
+        return null;
+      }
+      
+      const csrfToken = match[1];
+      
+      // 2. Submit the login form
+      const params = new URLSearchParams();
+      params.append('csrfToken', csrfToken);
+      params.append('username', email); // OJS supports email for username
+      params.append('password', password);
+      
+      const res2 = await fetch(`${OJS_BASE_URL}/index.php/index/login/signIn`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Cookie': cookies
+        },
+        body: params.toString(),
+        redirect: 'manual' // We check for 302 Redirect to indicate success
+      });
+      
+      // A successful login returns a 302 redirect. A failed login returns 200 (re-rendering the form with an error)
+      if (res2.status === 302 || res2.status === 303) {
+        // Find the user details from our synced DB or fetch them directly from OJS to return the standard object.
+        // For auth purposes, returning the email is enough to confirm it succeeded.
+        return { email };
+      }
+      
+      return null;
     } catch (e) {
       console.error('OJS proxy login failed:', e);
       return null;
@@ -485,18 +504,38 @@ export class OjsClient {
   async fetchAllUsers(): Promise<any[]> {
     if (this.isMock()) return MOCK_ALL_USERS;
     try {
-      const res = await fetch(`${OJS_BASE_URL}/index.php/index/api/v1/users`, {
-        headers: { Authorization: `Bearer ${OJS_API_KEY}` }
-      });
-      if (!res.ok) return [];
-      const data = (await res.json()) as any;
-      return data.items.map((item: any) => ({
-        email: item.email,
-        firstName: item.givenName?.en || 'Unknown',
-        lastName: item.familyName?.en || '',
-        // Role ID 1 = Site Admin, 16 = Journal Manager
-        role: (item.groups && item.groups.some((g: any) => g.roleId === 1 || g.roleId === 16)) ? 'admin' : 'author'
-      }));
+      const allUsers = new Map<string, any>();
+      
+      // Ensure journals are loaded first to get paths
+      if (this.journalPathMap.size === 0) {
+        await this.fetchJournals();
+      }
+
+      for (const path of this.journalPathMap.values()) {
+        const res = await fetch(`${OJS_BASE_URL}/index.php/${path}/api/v1/users`, {
+          headers: { Authorization: `Bearer ${OJS_API_KEY}` }
+        });
+        
+        if (!res.ok) continue;
+        const data = (await res.json()) as any;
+        
+        if (data && Array.isArray(data.items)) {
+          for (const item of data.items) {
+            // Use email as unique identifier
+            if (item.email && !allUsers.has(item.email)) {
+              allUsers.set(item.email, {
+                email: item.email,
+                firstName: item.givenName?.en || item.preferredPublicName?.en || item.userName || 'Unknown',
+                lastName: item.familyName?.en || '',
+                // Role ID 1 = Site Admin. We exclude 16 (Journal Manager/Editor) so they don't get platform admin rights
+                role: (item.groups && item.groups.some((g: any) => g.roleId === 1)) ? 'admin' : 'author'
+              });
+            }
+          }
+        }
+      }
+      
+      return Array.from(allUsers.values());
     } catch (e) {
       console.warn('OJS API call failed fetching all users:', e);
       return [];

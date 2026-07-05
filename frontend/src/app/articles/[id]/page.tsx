@@ -142,7 +142,7 @@ export default async function ArticleDetailPage({
             </p>
           </div>
 
-          <PDFViewer pdfUrl={article.pdfUrl} />
+          <PDFViewer articleId={article.id} pdfUrl={article.pdfUrl} />
         </div>
 
         <div className="lg:col-span-1">

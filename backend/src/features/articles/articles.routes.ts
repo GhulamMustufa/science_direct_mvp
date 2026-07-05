@@ -13,5 +13,6 @@ router.get('/articles', articlesController.getArticles);
 router.get('/articles/:id', articlesController.getArticleDetail);
 router.get('/articles/:id/download', articlesController.trackDownload);
 router.post('/articles/:id/view', articlesController.trackView);
+router.get('/articles/:id/pdf', articlesController.streamPdf);
 
 export default router;
