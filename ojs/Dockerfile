@@ -6,4 +6,3 @@ FROM pkpofficial/ojs:stable-3_4_0
 
 EXPOSE 80
 
-VOLUME ["/var/www/html/files", "/var/www/html/public"]
