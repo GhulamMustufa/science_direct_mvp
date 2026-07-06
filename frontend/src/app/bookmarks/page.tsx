@@ -7,6 +7,7 @@ import { useBookmarks } from "@/features/articles/hooks/useBookmarks";
 import { ArticleCard } from "@/features/articles/components/ArticleCard";
 import { Button } from "@/components/ui/button";
 import { Bookmark } from "@/types";
+import { ArticleListSkeleton } from "@/components/ui/Loading";
 
 function BookmarkListEntry({ bookmark, onRemove }: { bookmark: Bookmark; onRemove: (id: string) => void }) {
   return (
@@ -37,10 +38,6 @@ export default function BookmarksPage() {
     }
   }, [user, authLoading, router]);
 
-  if (authLoading || loading) {
-    return <div className="container mx-auto px-4 py-12 text-center text-zinc-500">Loading Bookmarks...</div>;
-  }
-
   const totalPages = Math.ceil(total / 10) || 1;
 
   return (
@@ -54,7 +51,9 @@ export default function BookmarksPage() {
         </p>
       </div>
 
-      {bookmarks.length === 0 ? (
+      {authLoading || loading ? (
+        <ArticleListSkeleton count={3} />
+      ) : bookmarks.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500">
           You haven&apos;t bookmarked any publications yet.
         </div>

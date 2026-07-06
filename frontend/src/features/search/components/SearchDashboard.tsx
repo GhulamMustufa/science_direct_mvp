@@ -6,6 +6,7 @@ import { SearchFilters } from "./SearchFilters";
 import { ArticleCard } from "@/features/articles/components/ArticleCard";
 import { useSearch } from "../hooks/useSearch";
 import { Button } from "@/components/ui/button";
+import { ArticleListSkeleton } from "@/components/ui/Loading";
 
 function PaginationControls({
   page,
@@ -77,15 +78,21 @@ export function SearchDashboard() {
 
             {error && <div className="text-sm text-red-600">{error}</div>}
 
-            {!loading && articles.length === 0 && (
-              <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800">
-                <p className="text-sm text-zinc-500">No publications matched your search.</p>
-              </div>
-            )}
+            {loading ? (
+              <ArticleListSkeleton count={3} />
+            ) : (
+              <>
+                {articles.length === 0 && (
+                  <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800">
+                    <p className="text-sm text-zinc-500">No publications matched your search.</p>
+                  </div>
+                )}
 
-            {!loading && articles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
+                {articles.map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+              </>
+            )}
           </div>
 
           {!loading && total > 0 && (

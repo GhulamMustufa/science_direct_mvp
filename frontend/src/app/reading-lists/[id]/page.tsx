@@ -7,6 +7,7 @@ import { readingListsService, ReadingListDetailResponse } from "@/features/readi
 import { ArticleCard } from "@/features/articles/components/ArticleCard";
 import { Button } from "@/components/ui/button";
 import { ReadingList, Article } from "@/types";
+import { ArticleListSkeleton } from "@/components/ui/Loading";
 
 function ListHeader({ readingList }: { readingList: ReadingList }) {
   return (
@@ -88,28 +89,36 @@ export default function ReadingListDetailPage() {
     }
   };
 
-  if (authLoading || loading || !detail) {
-    return <div className="container mx-auto px-4 py-12 text-center text-zinc-500">Loading Reading List Details...</div>;
-  }
-
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 flex-1 flex flex-col">
-      <ListHeader readingList={detail.readingList} />
-
-      {detail.articles.length === 0 ? (
-        <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500">
-          This reading list is currently empty.
-        </div>
+      {authLoading || loading || !detail ? (
+        <>
+          <div className="border-b border-zinc-200 pb-6 mb-8 dark:border-zinc-800 animate-pulse">
+            <div className="h-9 w-48 bg-zinc-250 dark:bg-zinc-800 rounded mb-2" />
+            <div className="h-4 w-64 bg-zinc-200 dark:bg-zinc-800 rounded" />
+          </div>
+          <ArticleListSkeleton count={2} />
+        </>
       ) : (
-        <div className="space-y-6">
-          {detail.articles.map((article) => (
-            <ArticleListEntry
-              key={article.id}
-              article={article}
-              onRemove={handleRemoveArticle}
-            />
-          ))}
-        </div>
+        <>
+          <ListHeader readingList={detail.readingList} />
+
+          {detail.articles.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500">
+              This reading list is currently empty.
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {detail.articles.map((article) => (
+                <ArticleListEntry
+                  key={article.id}
+                  article={article}
+                  onRemove={handleRemoveArticle}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

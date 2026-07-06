@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService, AuthorDashboardResponse, SubmissionResponse } from "@/features/author/services/author.service";
 import { Article } from "@/types";
+import { DashboardSkeleton } from "@/components/ui/Loading";
 
 function MetricCard({ title, value }: { title: string; value: number }) {
   return (
@@ -193,13 +194,9 @@ export default function AuthorDashboardPage() {
     loadDashboard();
   }, [user, authLoading, router]);
 
-  if (authLoading || loading || !data) {
-    return <div className="container mx-auto px-4 py-12 text-center text-zinc-500">Loading Dashboard...</div>;
-  }
-
-  const activeSubmissionsCount = data.submissions.filter(
+  const activeSubmissionsCount = data ? data.submissions.filter(
     (s) => s.status !== "published" && s.status !== "rejected"
-  ).length;
+  ).length : 0;
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 flex-1 space-y-8">
@@ -212,22 +209,28 @@ export default function AuthorDashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-        <MetricCard title="Publications" value={data.publications.length} />
-        <MetricCard title="Active Submissions" value={activeSubmissionsCount} />
-        <MetricCard title="Total Views" value={data.totalViews} />
-        <MetricCard title="Total Downloads" value={data.totalDownloads} />
-      </div>
+      {authLoading || loading || !data ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
+            <MetricCard title="Publications" value={data.publications.length} />
+            <MetricCard title="Active Submissions" value={activeSubmissionsCount} />
+            <MetricCard title="Total Views" value={data.totalViews} />
+            <MetricCard title="Total Downloads" value={data.totalDownloads} />
+          </div>
 
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Active Submissions</h2>
-        <SubmissionsTable submissions={data.submissions} />
-      </div>
+          <div className="space-y-4">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Active Submissions</h2>
+            <SubmissionsTable submissions={data.submissions} />
+          </div>
 
-      <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-        <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Linked Publications</h2>
-        <PublicationsTable publications={data.publications} />
-      </div>
+          <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Linked Publications</h2>
+            <PublicationsTable publications={data.publications} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

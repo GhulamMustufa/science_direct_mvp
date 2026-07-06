@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAdmin } from "@/features/admin/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
 import { User, UserRole } from "@/types";
+import { TableSkeleton } from "@/components/ui/Loading";
 
 function RoleModal({ user, onSave, onClose }: { user: User; onSave: (role: string) => Promise<void>; onClose: () => void }) {
   const [selectedRole, setSelectedRole] = useState<UserRole>(user.role);
@@ -69,10 +70,6 @@ export default function UsersAdminPage() {
   const { users, totalUsers, loadingUsers, usersPage, setUsersPage, changeUserRole } = useAdmin();
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  if (loadingUsers) {
-    return <div className="text-center py-12 text-zinc-500">Loading user catalog...</div>;
-  }
-
   const totalPages = Math.ceil(totalUsers / 10) || 1;
 
   return (
@@ -82,31 +79,37 @@ export default function UsersAdminPage() {
         <p className="mt-2 text-sm text-zinc-500">Configure roles and authorization profiles for the system.</p>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-zinc-150 bg-zinc-50/70 text-xs font-semibold text-zinc-500 uppercase tracking-wider dark:border-zinc-800 dark:bg-zinc-900/30">
-              <th className="px-6 py-4">Name</th>
-              <th className="px-6 py-4">Email</th>
-              <th className="px-6 py-4">Role</th>
-              <th className="px-6 py-4">Registered</th>
-              <th className="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-            {users.map((u) => (
-              <UserRow key={u.id} user={u} onEdit={() => setEditingUser(u)} />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {loadingUsers ? (
+        <TableSkeleton rows={5} />
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-zinc-150 bg-zinc-50/70 text-xs font-semibold text-zinc-500 uppercase tracking-wider dark:border-zinc-800 dark:bg-zinc-900/30">
+                  <th className="px-6 py-4">Name</th>
+                  <th className="px-6 py-4">Email</th>
+                  <th className="px-6 py-4">Role</th>
+                  <th className="px-6 py-4">Registered</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                {users.map((u) => (
+                  <UserRow key={u.id} user={u} onEdit={() => setEditingUser(u)} />
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-      {totalUsers > 10 && (
-        <div className="flex items-center justify-between pt-4">
-          <Button variant="outline" size="sm" disabled={usersPage <= 1} onClick={() => setUsersPage(usersPage - 1)}>Previous</Button>
-          <span className="text-sm text-zinc-500">Page {usersPage} of {totalPages}</span>
-          <Button variant="outline" size="sm" disabled={usersPage >= totalPages} onClick={() => setUsersPage(usersPage + 1)}>Next</Button>
-        </div>
+          {totalUsers > 10 && (
+            <div className="flex items-center justify-between pt-4">
+              <Button variant="outline" size="sm" disabled={usersPage <= 1} onClick={() => setUsersPage(usersPage - 1)}>Previous</Button>
+              <span className="text-sm text-zinc-500">Page {usersPage} of {totalPages}</span>
+              <Button variant="outline" size="sm" disabled={usersPage >= totalPages} onClick={() => setUsersPage(usersPage + 1)}>Next</Button>
+            </div>
+          )}
+        </>
       )}
 
       {editingUser && (
@@ -119,3 +122,4 @@ export default function UsersAdminPage() {
     </div>
   );
 }
+
