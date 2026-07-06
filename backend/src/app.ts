@@ -20,8 +20,14 @@ import { errorHandler } from './middleware/error.js';
 const app = express();
 
 // Standard middlewares
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+const corsOrigins = [
+  frontendUrl.endsWith('/') ? frontendUrl.slice(0, -1) : frontendUrl,
+  frontendUrl.endsWith('/') ? frontendUrl : `${frontendUrl}/`
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: corsOrigins,
   credentials: true,
 }));
 app.use(express.json());
