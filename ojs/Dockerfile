@@ -5,9 +5,11 @@ RUN echo 'SetEnvIf X-Forwarded-Proto "https" HTTPS=on' >> /var/www/html/.htacces
 
 # Disable IP validation on sessions (prevents instant logout behind Railway reverse proxy)
 RUN sed -i 's/session_check_ip = On/session_check_ip = Off/g' /var/www/html/config.TEMPLATE.inc.php
+RUN sed -i 's/session_check_ip = On/session_check_ip = Off/g' /var/www/html/config.inc.php
 
 # Trust proxy headers so OJS gets correct client IPs
 RUN sed -i 's/trust_x_forwarded_for = Off/trust_x_forwarded_for = On/g' /var/www/html/config.TEMPLATE.inc.php
+RUN sed -i 's/trust_x_forwarded_for = Off/trust_x_forwarded_for = On/g' /var/www/html/config.inc.php
 
 EXPOSE 80
 
