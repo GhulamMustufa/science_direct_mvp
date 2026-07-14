@@ -1,4 +1,10 @@
-import { ValidationResult, ValidationError } from './ValidationResult.js';
+import { 
+  ValidationResult, 
+  ValidationError, 
+  ValidationIssue, 
+  ValidationReport,
+  CategoryResult 
+} from './ValidationResult.js';
 import { TitleValidator } from './validators/TitleValidator.js';
 import { AbstractValidator } from './validators/AbstractValidator.js';
 import { AuthorValidator, AuthorData } from './validators/AuthorValidator.js';
@@ -45,71 +51,163 @@ export class ValidationService {
   private metadataValidator = new MetadataValidator();
 
   validateSubmission(payload: SubmissionPayload): ValidationResult {
-    const errors: ValidationError[] = [];
+    const report = this.validateSubmissionReport(payload);
+    return {
+      isValid: report.isValid,
+      errors: report.errors
+    };
+  }
 
-    // Fallback strategy: Parsed Document takes priority, fallback to manual form inputs
+  validateSubmissionReport(payload: SubmissionPayload): ValidationReport {
+    const startTime = performance.now();
+
     const parsed = payload.parsedDocument || ({} as Partial<ParsedDocument>);
-    
     const finalTitle = parsed.title || payload.title;
     const finalAbstract = parsed.abstract || payload.abstract;
     const finalKeywords = parsed.keywords && parsed.keywords.length > 0 ? parsed.keywords : payload.keywords;
-    
-    // Authors, section, and language are usually manual because they involve structured/system-specific enum data
-    const finalAuthors = payload.authors; 
+    const finalAuthors = payload.authors;
     const finalSection = payload.section;
     const finalLanguage = payload.language;
 
-    const titleRes = this.titleValidator.validate(finalTitle);
-    if (!titleRes.isValid) errors.push(...titleRes.errors);
+    const categoryMap: { [key: string]: string } = {
+      title: 'Metadata',
+      abstract: 'Metadata',
+      keywords: 'Metadata',
+      section: 'Metadata',
+      language: 'Metadata',
+      metadata: 'Metadata',
+      authors: 'Authors',
+      file: 'File',
+      headings: 'Structure',
+      sections: 'Structure',
+      wordCount: 'Structure',
+      pageCount: 'Structure',
+      figures: 'Structure',
+      tables: 'Structure',
+      references: 'Structure'
+    };
 
-    const abstractRes = this.abstractValidator.validate(finalAbstract);
-    if (!abstractRes.isValid) errors.push(...abstractRes.errors);
+    const runCheck = (
+      name: string,
+      validator: { validate: (arg: any) => ValidationResult },
+      value: any
+    ): ValidationIssue[] => {
+      const res = validator.validate(value);
+      const cat = categoryMap[name] || 'General';
+      return res.errors.map(err => ({
+        field: name,
+        message: err.message,
+        severity: err.severity || 'error',
+        category: cat
+      }));
+    };
 
-    const authorRes = this.authorValidator.validate(finalAuthors);
-    if (!authorRes.isValid) errors.push(...authorRes.errors);
+    const rawIssues: ValidationIssue[] = [];
 
-    const keywordRes = this.keywordValidator.validate(finalKeywords);
-    if (!keywordRes.isValid) errors.push(...keywordRes.errors);
+    // Run Metadata Validators
+    rawIssues.push(...runCheck('title', this.titleValidator, finalTitle));
+    rawIssues.push(...runCheck('abstract', this.abstractValidator, finalAbstract));
+    rawIssues.push(...runCheck('keywords', this.keywordValidator, finalKeywords));
+    rawIssues.push(...runCheck('section', this.sectionValidator, finalSection));
+    rawIssues.push(...runCheck('language', this.languageValidator, finalLanguage));
 
-    const sectionRes = this.sectionValidator.validate(finalSection);
-    if (!sectionRes.isValid) errors.push(...sectionRes.errors);
+    // Run Authors Validator
+    rawIssues.push(...runCheck('authors', this.authorValidator, finalAuthors));
 
-    const languageRes = this.languageValidator.validate(finalLanguage);
-    if (!languageRes.isValid) errors.push(...languageRes.errors);
+    // Run File Validator
+    rawIssues.push(...runCheck('file', this.fileValidator, payload.file));
 
-    const fileRes = this.fileValidator.validate(payload.file);
-    if (!fileRes.isValid) errors.push(...fileRes.errors);
-
-    // Structural validations on the parsed document
+    // Run Structural Parsed Document Validators
     if (payload.parsedDocument) {
-      const headingsRes = this.headingsValidator.validate(payload.parsedDocument.sections);
-      if (!headingsRes.isValid) errors.push(...headingsRes.errors);
-
-      const reqSectionsRes = this.requiredSectionsValidator.validate(payload.parsedDocument.sections);
-      if (!reqSectionsRes.isValid) errors.push(...reqSectionsRes.errors);
-
-      const wordCountRes = this.wordCountValidator.validate(payload.parsedDocument.wordCount);
-      if (!wordCountRes.isValid) errors.push(...wordCountRes.errors);
-
-      const pageCountRes = this.pageCountValidator.validate(payload.parsedDocument.pageCount);
-      if (!pageCountRes.isValid) errors.push(...pageCountRes.errors);
-
-      const figuresRes = this.figuresValidator.validate(payload.parsedDocument.figures);
-      if (!figuresRes.isValid) errors.push(...figuresRes.errors);
-
-      const tablesRes = this.tablesValidator.validate(payload.parsedDocument.tables);
-      if (!tablesRes.isValid) errors.push(...tablesRes.errors);
-
-      const referencesRes = this.referencesValidator.validate(payload.parsedDocument.references);
-      if (!referencesRes.isValid) errors.push(...referencesRes.errors);
-
-      const metadataRes = this.metadataValidator.validate(payload.parsedDocument);
-      if (!metadataRes.isValid) errors.push(...metadataRes.errors);
+      rawIssues.push(...runCheck('headings', this.headingsValidator, payload.parsedDocument.sections));
+      rawIssues.push(...runCheck('sections', this.requiredSectionsValidator, payload.parsedDocument.sections));
+      rawIssues.push(...runCheck('wordCount', this.wordCountValidator, payload.parsedDocument.wordCount));
+      rawIssues.push(...runCheck('pageCount', this.pageCountValidator, payload.parsedDocument.pageCount));
+      rawIssues.push(...runCheck('figures', this.figuresValidator, payload.parsedDocument.figures));
+      rawIssues.push(...runCheck('tables', this.tablesValidator, payload.parsedDocument.tables));
+      rawIssues.push(...runCheck('references', this.referencesValidator, payload.parsedDocument.references));
+      rawIssues.push(...runCheck('metadata', this.metadataValidator, payload.parsedDocument));
     }
+
+    const categoriesList = ['Metadata', 'Authors', 'File', 'Structure'];
+    const categories: { [category: string]: CategoryResult } = {};
+    
+    for (const cat of categoriesList) {
+      categories[cat] = {
+        score: 100,
+        passed: [],
+        issues: []
+      };
+    }
+
+    // Populate issues into categories
+    const errors: ValidationIssue[] = [];
+    const warnings: ValidationIssue[] = [];
+
+    for (const issue of rawIssues) {
+      const catObj = categories[issue.category] || { score: 100, passed: [], issues: [] };
+      catObj.issues.push(issue);
+      if (issue.severity === 'error') {
+        errors.push(issue);
+        catObj.score = Math.max(0, catObj.score - 20);
+      } else {
+        warnings.push(issue);
+        catObj.score = Math.max(0, catObj.score - 5);
+      }
+    }
+
+    // Determine which checks passed
+    const allChecks = [
+      { name: 'Document Title Check', field: 'title', category: 'Metadata' },
+      { name: 'Document Abstract Check', field: 'abstract', category: 'Metadata' },
+      { name: 'Keywords Compliance', field: 'keywords', category: 'Metadata' },
+      { name: 'Journal Section Match', field: 'section', category: 'Metadata' },
+      { name: 'Language Setting Check', field: 'language', category: 'Metadata' },
+      { name: 'Authors Information', field: 'authors', category: 'Authors' },
+      { name: 'File Structure Validation', field: 'file', category: 'File' }
+    ];
+
+    if (payload.parsedDocument) {
+      allChecks.push(
+        { name: 'Headings Count', field: 'headings', category: 'Structure' },
+        { name: 'Required Sections Verification', field: 'sections', category: 'Structure' },
+        { name: 'Word Count Limits', field: 'wordCount', category: 'Structure' },
+        { name: 'Page Count Limits', field: 'pageCount', category: 'Structure' },
+        { name: 'Figures Limit and Density', field: 'figures', category: 'Structure' },
+        { name: 'Tables Limit and Density', field: 'tables', category: 'Structure' },
+        { name: 'References Density Check', field: 'references', category: 'Structure' },
+        { name: 'Comprehensive Metadata Extract', field: 'metadata', category: 'Metadata' }
+      );
+    }
+
+    const passed: Array<{ name: string; category: string }> = [];
+
+    for (const check of allChecks) {
+      const fieldIssues = rawIssues.filter(i => i.field === check.field);
+      // If there are no error level issues, we consider it passed (warnings don't fail the check, but are listed separately)
+      if (!fieldIssues.some(i => i.severity === 'error')) {
+        passed.push(check);
+        categories[check.category].passed.push(check.name);
+      }
+    }
+
+    // Overall score is the average of category scores
+    let totalScoreSum = 0;
+    for (const cat of categoriesList) {
+      totalScoreSum += categories[cat].score;
+    }
+    const score = Math.round(totalScoreSum / categoriesList.length);
+
+    const executionTimeMs = performance.now() - startTime;
 
     return {
       isValid: errors.length === 0,
-      errors
+      score,
+      passed,
+      warnings,
+      errors,
+      executionTimeMs,
+      categories
     };
   }
 

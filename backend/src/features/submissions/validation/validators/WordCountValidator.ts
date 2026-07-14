@@ -12,9 +12,23 @@ export class WordCountValidator implements Validator<number | undefined> {
     if (!result.success) {
       return {
         isValid: false,
-        errors: result.error.errors.map(e => ({ field: 'wordCount', message: e.message }))
+        errors: result.error.errors.map(e => ({ field: 'wordCount', message: e.message, severity: 'error' }))
       };
     }
-    return { isValid: true, errors: [] };
+
+    const count = wordCount || 0;
+    const errors = [];
+    if (count < 1000) {
+      errors.push({
+        field: 'wordCount',
+        message: 'Document is relatively short (< 1000 words).',
+        severity: 'warning' as const
+      });
+    }
+
+    return {
+      isValid: true,
+      errors
+    };
   }
 }

@@ -11,9 +11,23 @@ export class TablesValidator implements Validator<string[] | undefined> {
     if (!result.success) {
       return {
         isValid: false,
-        errors: result.error.errors.map(e => ({ field: 'tables', message: e.message }))
+        errors: result.error.errors.map(e => ({ field: 'tables', message: e.message, severity: 'error' }))
       };
     }
-    return { isValid: true, errors: [] };
+
+    const tableList = tables || [];
+    const errors = [];
+    if (tableList.length === 0) {
+      errors.push({
+        field: 'tables',
+        message: 'No tables detected in the document. Ensure this is correct.',
+        severity: 'warning' as const
+      });
+    }
+
+    return {
+      isValid: true,
+      errors
+    };
   }
 }

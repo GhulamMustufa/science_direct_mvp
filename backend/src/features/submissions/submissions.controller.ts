@@ -92,3 +92,40 @@ export const uploadRevision = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const validateArticle = async (req: Request, res: Response) => {
+  try {
+    const submitterId = req.user?.id;
+    if (!submitterId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    let parsedDocument;
+    if (req.file) {
+      try {
+        const fs = await import('fs/promises');
+        const buffer = await fs.readFile(req.file.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+      } catch (err) {
+        console.error('Document parsing error:', err);
+      }
+    }
+
+    const payload = {
+      title: req.body.title,
+      abstract: req.body.abstract,
+      section: req.body.section,
+      language: req.body.language,
+      authors: req.body.authors ? JSON.parse(req.body.authors) : undefined,
+      keywords: req.body.keywords ? JSON.parse(req.body.keywords) : undefined,
+      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      parsedDocument
+    };
+
+    const report = validationService.validateSubmissionReport(payload);
+    res.json(report);
+  } catch (error) {
+    console.error('Error validating article:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

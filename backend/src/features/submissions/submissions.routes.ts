@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/authenticate.js';
 import multer from 'multer';
-import { submitArticle, getMySubmissions, uploadRevision } from './submissions.controller.js';
+import { submitArticle, getMySubmissions, uploadRevision, validateArticle } from './submissions.controller.js';
 import path from 'path';
 
 const router = Router();
@@ -36,6 +36,7 @@ const upload = multer({
 });
 
 router.post('/submissions', authenticate, upload.single('pdf'), submitArticle);
+router.post('/submissions/validate', authenticate, upload.single('pdf'), validateArticle);
 router.get('/submissions', authenticate, getMySubmissions);
 router.post('/submissions/:id/revisions', authenticate, upload.single('pdf'), uploadRevision);
 

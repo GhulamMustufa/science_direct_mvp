@@ -1,12 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService } from "@/features/author/services/author.service";
-import { submissionValidator } from '@/features/author/validation/SubmissionValidator';
-import { AuthorData } from '@/features/author/validation/validators/AuthorValidator';
-import { Plus, X, User } from "lucide-react";
+import { Plus, X, User, ShieldCheck, ShieldAlert, History, FileText } from "lucide-react";
+
+export interface AuthorData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  affiliation: string;
+  isCorresponding: boolean;
+}
 
 export default function SubmitArticlePage() {
   const router = useRouter();
@@ -32,6 +38,18 @@ export default function SubmitArticlePage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Live validation and history state
+  const [liveReport, setLiveReport] = useState<any>(null);
+  const [isLiveValidating, setIsLiveValidating] = useState(false);
+  const [liveError, setLiveError] = useState<string | null>(null);
+  const [historyList, setHistoryList] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load history on mount
+    const history = JSON.parse(localStorage.getItem("validation_history") || "[]");
+    setHistoryList(history);
+  }, []);
+
   if (authLoading) return <div className="p-8 text-center">Loading...</div>;
   if (!user) {
     router.push("/login");
@@ -45,7 +63,33 @@ export default function SubmitArticlePage() {
     }));
   };
 
+  useEffect(() => {
+    if (!pdfFile) {
+      setLiveReport(null);
+      return;
+    }
 
+    const delayDebounce = setTimeout(async () => {
+      setIsLiveValidating(true);
+      setLiveError(null);
+      try {
+        const formData = new FormData();
+        formData.append("section", section);
+        formData.append("language", language);
+        formData.append("authors", JSON.stringify(authors));
+        formData.append("pdf", pdfFile);
+
+        const report = await authorService.validateArticle(formData);
+        setLiveReport(report);
+      } catch (err: any) {
+        setLiveError(err.message || "Live validation failed");
+      } finally {
+        setIsLiveValidating(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(delayDebounce);
+  }, [pdfFile, section, language, authors]);
 
   const addAuthor = () => {
     setAuthors([...authors, { firstName: "", lastName: "", email: "", affiliation: "", isCorresponding: false }]);
@@ -80,34 +124,83 @@ export default function SubmitArticlePage() {
     e.preventDefault();
     setError(null);
 
-    const validationResult = submissionValidator.validateSubmission({
-      section,
-      language,
-      authors,
-      file: pdfFile,
-      checklist,
-    });
-
-    if (!validationResult.isValid) {
-      setError(validationResult.errors.map(err => err.message).join('\n'));
+    if (!pdfFile) {
+      setError("Please upload your manuscript file first");
       return;
     }
 
     try {
       setIsSubmitting(true);
+      
+      // Save file to IndexedDB
+      const saveFileToIndexedDB = (file: File): Promise<void> => {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open('SubmissionDB', 1);
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains('files')) {
+              db.createObjectStore('files');
+            }
+          };
+          request.onsuccess = () => {
+            const db = request.result;
+            const tx = db.transaction('files', 'readwrite');
+            tx.objectStore('files').put(file, 'draftFile');
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          };
+          request.onerror = () => reject(request.error);
+        });
+      };
+
+      await saveFileToIndexedDB(pdfFile!);
+
+      // Save form inputs to sessionStorage
+      const formDataObj = {
+        section,
+        language,
+        authors,
+        checklist
+      };
+      sessionStorage.setItem("lastValidationFormData", JSON.stringify(formDataObj));
+      sessionStorage.setItem("lastValidationFileName", pdfFile.name);
+
       const formData = new FormData();
       formData.append("section", section);
       formData.append("language", language);
       formData.append("authors", JSON.stringify(authors));
-      formData.append("pdf", pdfFile!);
+      formData.append("pdf", pdfFile);
 
-      await authorService.submitArticle(formData);
-      router.push("/author"); // Redirect to dashboard
+      const report = await authorService.validateArticle(formData);
+      sessionStorage.setItem("lastValidationReport", JSON.stringify(report));
+
+      // Append to local validation history
+      const historyItem = {
+        id: Date.now().toString(),
+        fileName: pdfFile.name,
+        timestamp: new Date().toLocaleString(),
+        score: report.score,
+        isValid: report.isValid,
+        report: report,
+        formData: formDataObj
+      };
+      const history = JSON.parse(localStorage.getItem("validation_history") || "[]");
+      history.unshift(historyItem);
+      localStorage.setItem("validation_history", JSON.stringify(history.slice(0, 10)));
+
+      router.push("/author/submit/validate");
     } catch (err: any) {
-      setError(err.message || "Failed to submit article");
+      setError(err.message || "Failed to validate article");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleLoadHistory = (item: any) => {
+    sessionStorage.setItem("lastValidationReport", JSON.stringify(item.report));
+    sessionStorage.setItem("lastValidationFormData", JSON.stringify(item.formData));
+    sessionStorage.setItem("lastValidationFileName", item.fileName);
+    router.push("/author/submit/validate");
   };
 
   return (
@@ -341,6 +434,40 @@ export default function SubmitArticlePage() {
               onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
               className="mt-2 block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-zinc-800 dark:file:text-zinc-300"
             />
+            {isLiveValidating && (
+              <p className="text-xs text-blue-500 mt-2 flex items-center gap-1.5 animate-pulse">
+                Running live manuscript structure check...
+              </p>
+            )}
+            {liveError && (
+              <p className="text-xs text-rose-500 mt-2 flex items-center gap-1.5">
+                <ShieldAlert size={14} /> Live check error: {liveError}
+              </p>
+            )}
+            {liveReport && (
+              <div className="mt-4 p-4 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between text-sm">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-full ${
+                    liveReport.isValid 
+                      ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600' 
+                      : 'bg-rose-50 dark:bg-rose-950/20 text-rose-600'
+                  }`}>
+                    {liveReport.isValid ? <ShieldCheck size={20} /> : <ShieldAlert size={20} />}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-zinc-800 dark:text-zinc-200">
+                      Live Manuscript Score: <span className="font-extrabold">{liveReport.score}/100</span>
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      {liveReport.errors.length} blocking errors, {liveReport.warnings.length} warnings
+                    </p>
+                  </div>
+                </div>
+                <div className="text-xs text-zinc-400">
+                  Validated in {liveReport.executionTimeMs.toFixed(0)}ms
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -357,10 +484,75 @@ export default function SubmitArticlePage() {
             disabled={isSubmitting || !Object.values(checklist).every(Boolean)}
             className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            {isSubmitting ? "Submitting..." : "Submit Article"}
+            {isSubmitting ? "Validating..." : "Validate & Submit"}
           </button>
         </div>
       </form>
+
+      {historyList.length > 0 && (
+        <div className="mt-12 bg-white dark:bg-zinc-900 p-6 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+            <History size={20} className="text-zinc-500" />
+            Recent Validations History
+          </h2>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
+              <thead>
+                <tr className="text-left font-medium text-zinc-500 dark:text-zinc-400">
+                  <th className="pb-3 pr-4">Date/Time</th>
+                  <th className="pb-3 px-4">Manuscript File</th>
+                  <th className="pb-3 px-4">Overall Score</th>
+                  <th className="pb-3 px-4">Compliance</th>
+                  <th className="pb-3 pl-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                {historyList.map((item) => (
+                  <tr key={item.id} className="text-zinc-700 dark:text-zinc-300">
+                    <td className="py-3.5 pr-4 whitespace-nowrap text-xs text-zinc-500">{item.timestamp}</td>
+                    <td className="py-3.5 px-4 font-medium max-w-[200px] truncate flex items-center gap-1.5">
+                      <FileText size={16} className="text-zinc-400 flex-shrink-0" />
+                      {item.fileName}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className={`font-bold px-2 py-0.5 rounded text-xs ${
+                        item.score >= 90 
+                          ? 'text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20' 
+                          : item.score >= 70
+                            ? 'text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20'
+                            : 'text-rose-700 bg-rose-50 dark:text-rose-400 dark:bg-rose-950/20'
+                      }`}>
+                        {item.score}/100
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      {item.isValid ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                          Passed
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 font-medium">
+                          Failed Checks
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3.5 pl-4">
+                      <button
+                        type="button"
+                        onClick={() => handleLoadHistory(item)}
+                        className="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-semibold"
+                      >
+                        View Scorecard
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

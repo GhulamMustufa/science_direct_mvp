@@ -40,6 +40,22 @@ export const authorService = {
     return res.json();
   },
 
+  async validateArticle(formData: FormData): Promise<any> {
+    const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/submissions/validate`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to validate article');
+    }
+    return res.json();
+  },
+
   async getMySubmissions(): Promise<SubmissionResponse[]> {
     return apiFetch<SubmissionResponse[]>("/submissions");
   },

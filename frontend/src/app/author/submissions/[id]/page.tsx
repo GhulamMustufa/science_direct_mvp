@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService, SubmissionResponse } from "@/features/author/services/author.service";
-import { submissionValidator } from '@/features/author/validation/SubmissionValidator';
 
 export default function SubmissionDetailsPage() {
   const router = useRouter();
@@ -48,9 +47,8 @@ export default function SubmissionDetailsPage() {
     e.preventDefault();
     if (!submission) return;
 
-    const validationResult = submissionValidator.validateRevision({ file: pdfFile });
-    if (!validationResult.isValid) {
-      alert(validationResult.errors.map(err => err.message).join('\n'));
+    if (!pdfFile) {
+      alert("Please select a file to upload");
       return;
     }
     
