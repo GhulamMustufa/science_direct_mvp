@@ -16,6 +16,10 @@ export class EditorialService {
   async publishArticle(articleId: string, volumeId: string) {
     return await editorialRepository.publishArticle(articleId, volumeId);
   }
+
+  async publishArticleWithNewVolume(articleId: string, journalId: string, volumeNumber: string, year: string) {
+    return await editorialRepository.publishArticleWithNewVolume(articleId, journalId, volumeNumber, year);
+  }
 }
 
 export const editorialService = new EditorialService();

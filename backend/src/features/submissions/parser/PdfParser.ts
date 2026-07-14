@@ -1,14 +1,13 @@
 import { DocumentParser, ParsedDocument } from './DocumentParser.js';
 import pdfParseModule from 'pdf-parse';
 
-// Handle CommonJS / ESM interop for pdf-parse
-const pdfParse = (pdfParseModule as any).default || pdfParseModule;
-
 export class PdfParser implements DocumentParser {
   async parse(buffer: Buffer): Promise<ParsedDocument> {
-    const data = await (pdfParse as any)(buffer);
-    const rawText = data.text;
-    const pageCount = data.numpages;
+    const PDFParseClass = (pdfParseModule as any).PDFParse || pdfParseModule;
+    const parser = new PDFParseClass({ data: buffer });
+    const textResult = await parser.getText();
+    const rawText = textResult.text;
+    const pageCount = textResult.total;
 
     const wordCount = rawText.split(/\s+/).filter((w: string) => w.length > 0).length;
 

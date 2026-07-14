@@ -50,21 +50,8 @@ export default function SubmitArticlePage() {
     setHistoryList(history);
   }, []);
 
-  if (authLoading) return <div className="p-8 text-center">Loading...</div>;
-  if (!user) {
-    router.push("/login");
-    return null;
-  }
-
-  const handleCheckboxChange = (key: keyof typeof checklist) => {
-    setChecklist((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
   useEffect(() => {
-    if (!pdfFile) {
+    if (!pdfFile || authLoading || !user) {
       setLiveReport(null);
       return;
     }
@@ -89,7 +76,20 @@ export default function SubmitArticlePage() {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [pdfFile, section, language, authors]);
+  }, [pdfFile, section, language, authors, authLoading, user]);
+
+  if (authLoading) return <div className="p-8 text-center">Loading...</div>;
+  if (!user) {
+    router.push("/login");
+    return null;
+  }
+
+  const handleCheckboxChange = (key: keyof typeof checklist) => {
+    setChecklist((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
 
   const addAuthor = () => {
     setAuthors([...authors, { firstName: "", lastName: "", email: "", affiliation: "", isCorresponding: false }]);

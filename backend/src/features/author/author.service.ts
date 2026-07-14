@@ -35,8 +35,8 @@ export class AuthorService {
     }
 
     const [publications, submissions] = await Promise.all([
-      this.authorRepository.findPublicationsByAuthorId(author.id),
-      this.authorRepository.findSubmissionsByAuthorId(author.id),
+      this.authorRepository.findPublicationsByAuthorId(author.id, userId),
+      this.authorRepository.findSubmissionsByAuthorId(userId),
     ]);
 
     const totalViews = publications.reduce((acc, curr) => acc + (curr.views || 0), 0);

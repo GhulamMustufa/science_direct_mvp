@@ -9,6 +9,7 @@ export interface SubmissionResponse {
   createdAt?: string;
   submittedAt?: string;
   updatedAt?: string;
+  volumeId?: string;
 }
 
 export interface AuthorDashboardResponse {
@@ -24,36 +25,17 @@ export const authorService = {
   },
   
   async submitArticle(formData: FormData): Promise<SubmissionResponse> {
-    // FormData will contain title, abstract, pdf
-    const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/submissions`, {
+    return apiFetch<SubmissionResponse>("/submissions", {
       method: 'POST',
-      body: formData,
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      body: formData
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to submit article');
-    }
-    return res.json();
   },
 
   async validateArticle(formData: FormData): Promise<any> {
-    const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/submissions/validate`, {
+    return apiFetch<any>("/submissions/validate", {
       method: 'POST',
-      body: formData,
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      body: formData
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to validate article');
-    }
-    return res.json();
   },
 
   async getMySubmissions(): Promise<SubmissionResponse[]> {
@@ -61,18 +43,9 @@ export const authorService = {
   },
   
   async uploadRevision(articleId: string, formData: FormData): Promise<SubmissionResponse> {
-    const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/submissions/${articleId}/revisions`, {
+    return apiFetch<SubmissionResponse>(`/submissions/${articleId}/revisions`, {
       method: 'POST',
-      body: formData,
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      body: formData
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to upload revision');
-    }
-    return res.json();
   }
 };

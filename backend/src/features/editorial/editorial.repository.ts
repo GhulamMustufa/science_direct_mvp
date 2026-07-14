@@ -1,5 +1,5 @@
 import { db } from '../../lib/db.js';
-import { articles } from '../../db/schema/index.js';
+import { articles, volumes } from '../../db/schema/index.js';
 import { eq, desc } from 'drizzle-orm';
 
 export class EditorialRepository {
@@ -35,6 +35,30 @@ export class EditorialRepository {
       .where(eq(articles.id, articleId))
       .returning();
     return published;
+  }
+
+  async publishArticleWithNewVolume(articleId: string, journalId: string, volumeNumber: string, year: string) {
+    return await db.transaction(async (tx) => {
+      // 1. Create the new volume
+      const [newVolume] = await tx.insert(volumes).values({
+        journalId,
+        volumeNumber,
+        year,
+      }).returning();
+
+      // 2. Publish the article using the new volume id
+      const [published] = await tx.update(articles)
+        .set({
+          status: 'PUBLISHED',
+          volumeId: newVolume.id,
+          publishedAt: new Date(),
+          updatedAt: new Date()
+        })
+        .where(eq(articles.id, articleId))
+        .returning();
+
+      return published;
+    });
   }
 }
 

@@ -7,7 +7,10 @@ const decisionSchema = z.object({
 });
 
 const publishSchema = z.object({
-  volumeId: z.string().uuid(),
+  volumeId: z.string().uuid().optional(),
+  volumeNumber: z.string().optional(),
+  year: z.string().optional(),
+  journalId: z.string().uuid().optional(),
 });
 
 export const getSubmissions = async (req: Request, res: Response) => {
@@ -19,7 +22,7 @@ export const getSubmissions = async (req: Request, res: Response) => {
     } else {
       submissions = await editorialService.getAllSubmissions();
     }
-    res.json(submissions);
+    res.json({ success: true, data: submissions });
   } catch (error) {
     console.error('Error fetching editorial submissions:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -35,7 +38,7 @@ export const makeDecision = async (req: Request, res: Response) => {
     if (!updated) {
       return res.status(404).json({ error: 'Article not found' });
     }
-    res.json(updated);
+    res.json({ success: true, data: updated });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Validation error', details: error.errors });
@@ -50,11 +53,24 @@ export const publishArticle = async (req: Request, res: Response) => {
     const articleId = req.params.id;
     const validatedData = publishSchema.parse(req.body);
     
-    const published = await editorialService.publishArticle(articleId, validatedData.volumeId);
+    let published;
+    if (validatedData.volumeId) {
+      published = await editorialService.publishArticle(articleId, validatedData.volumeId);
+    } else if (validatedData.volumeNumber && validatedData.year && validatedData.journalId) {
+      published = await editorialService.publishArticleWithNewVolume(
+        articleId,
+        validatedData.journalId,
+        validatedData.volumeNumber,
+        validatedData.year
+      );
+    } else {
+      return res.status(400).json({ error: 'Validation error: Either volumeId or volumeNumber, year, and journalId must be specified' });
+    }
+
     if (!published) {
       return res.status(404).json({ error: 'Article not found' });
     }
-    res.json(published);
+    res.json({ success: true, data: published });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Validation error', details: error.errors });

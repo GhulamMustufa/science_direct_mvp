@@ -180,9 +180,9 @@ export class ReadingListsRepository {
       })
       .from(readingListArticles)
       .innerJoin(articles, eq(readingListArticles.articleId, articles.id))
-      .innerJoin(issues, eq(articles.issueId, issues.id))
-      .innerJoin(volumes, eq(issues.volumeId, volumes.id))
-      .innerJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(volumes, eq(articles.volumeId, volumes.id))
+      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(issues, eq(articles.issueId, issues.id))
       .where(and(eq(readingListArticles.readingListId, readingListId), isNull(articles.deletedAt)))
       .orderBy(desc(articles.publishedAt));
 

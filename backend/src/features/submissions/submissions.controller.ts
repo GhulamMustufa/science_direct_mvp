@@ -40,8 +40,14 @@ export const submitArticle = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Validation error', details: validationResult.errors });
     }
 
-    const article = await submissionsService.submitArticle(submitterId, req.body, req.file!);
-    res.status(201).json(article);
+    const mergedData = {
+      ...req.body,
+      title: req.body.title || parsedDocument?.title,
+      abstract: req.body.abstract || parsedDocument?.abstract,
+    };
+
+    const article = await submissionsService.submitArticle(submitterId, mergedData, req.file!);
+    res.status(201).json({ success: true, data: article });
   } catch (error) {
     console.error('Error submitting article:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -56,7 +62,7 @@ export const getMySubmissions = async (req: Request, res: Response) => {
     }
 
     const submissions = await submissionsService.getMySubmissions(submitterId);
-    res.json(submissions);
+    res.json({ success: true, data: submissions });
   } catch (error) {
     console.error('Error fetching submissions:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -82,7 +88,7 @@ export const uploadRevision = async (req: Request, res: Response) => {
     }
 
     const updatedArticle = await submissionsService.uploadRevision(submitterId, articleId, req.file!);
-    res.json(updatedArticle);
+    res.json({ success: true, data: updatedArticle });
   } catch (error: any) {
     if (error.message === 'Unauthorized') return res.status(403).json({ error: error.message });
     if (error.message === 'Article not found') return res.status(404).json({ error: error.message });
@@ -123,7 +129,7 @@ export const validateArticle = async (req: Request, res: Response) => {
     };
 
     const report = validationService.validateSubmissionReport(payload);
-    res.json(report);
+    res.json({ success: true, data: report });
   } catch (error) {
     console.error('Error validating article:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -65,9 +65,9 @@ export class ArticlesRepository {
     const baseQuery = db
       .select(selectFields)
       .from(articles)
-      .innerJoin(issues, eq(articles.issueId, issues.id))
-      .innerJoin(volumes, eq(issues.volumeId, volumes.id))
-      .innerJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(volumes, eq(articles.volumeId, volumes.id))
+      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(issues, eq(articles.issueId, issues.id))
       .where(whereAnd);
 
     const list = searchRank
@@ -92,9 +92,9 @@ export class ArticlesRepository {
     const countResult = await db
       .select({ count: sql<number>`count(distinct ${articles.id})` })
       .from(articles)
-      .innerJoin(issues, eq(articles.issueId, issues.id))
-      .innerJoin(volumes, eq(issues.volumeId, volumes.id))
-      .innerJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(volumes, eq(articles.volumeId, volumes.id))
+      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(issues, eq(articles.issueId, issues.id))
       .where(whereClause);
 
     return Number(countResult[0]?.count || 0);
@@ -185,9 +185,9 @@ export class ArticlesRepository {
         journalTitle: journals.title,
       })
       .from(articles)
-      .innerJoin(issues, eq(articles.issueId, issues.id))
-      .innerJoin(volumes, eq(issues.volumeId, volumes.id))
-      .innerJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(volumes, eq(articles.volumeId, volumes.id))
+      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(issues, eq(articles.issueId, issues.id))
       .where(and(eq(articles.id, id), isNull(articles.deletedAt)))
       .limit(1);
 

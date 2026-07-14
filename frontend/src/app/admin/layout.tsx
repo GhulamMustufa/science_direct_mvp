@@ -36,19 +36,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider px-3 mb-4">
           Admin Panel
         </h2>
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`block px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
-              pathname === link.href
-                ? "bg-blue-50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400"
-                : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-950"
-            }`}
-          >
-            {link.label}
-          </Link>
-        ))}
+        {links.map((link) => {
+          const isActive = pathname === link.href || (link.href !== "/admin" && pathname.startsWith(link.href));
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`block px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
+                isActive
+                  ? "bg-blue-50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400"
+                  : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-950"
+              }`}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </aside>
       <main className="flex-1 min-w-0">{children}</main>
     </div>

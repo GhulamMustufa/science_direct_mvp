@@ -42,10 +42,13 @@ export const adminService = {
     });
   },
 
-  async publishArticle(articleId: string, volumeId: string): Promise<SubmissionResponse> {
+  async publishArticle(
+    articleId: string, 
+    params: { volumeId?: string; volumeNumber?: string; year?: string; journalId?: string }
+  ): Promise<SubmissionResponse> {
     return apiFetch<SubmissionResponse>(`/editorial/submissions/${articleId}/publish`, {
       method: "POST",
-      body: JSON.stringify({ volumeId }),
+      body: JSON.stringify(params),
     });
   },
 };

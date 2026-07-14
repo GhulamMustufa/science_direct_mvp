@@ -1,4 +1,4 @@
-import { eq, and, isNull, desc, inArray, asc } from 'drizzle-orm';
+import { eq, and, or, isNull, desc, inArray, asc } from 'drizzle-orm';
 import { db } from '../../lib/db.js';
 import {
   articles,
@@ -29,7 +29,7 @@ export class AuthorRepository {
   /**
    * Find publications (articles) associated with an author, including co-authors.
    */
-  async findPublicationsByAuthorId(authorId: string): Promise<any[]> {
+  async findPublicationsByAuthorId(authorId: string, userId: string): Promise<any[]> {
     const list = await db
       .select({
         id: articles.id,
@@ -45,12 +45,21 @@ export class AuthorRepository {
         journalTitle: journals.title,
         journalId: journals.id,
       })
-      .from(articleAuthors)
-      .innerJoin(articles, eq(articleAuthors.articleId, articles.id))
-      .innerJoin(issues, eq(articles.issueId, issues.id))
-      .innerJoin(volumes, eq(issues.volumeId, volumes.id))
-      .innerJoin(journals, eq(volumes.journalId, journals.id))
-      .where(and(eq(articleAuthors.authorId, authorId), isNull(articles.deletedAt)))
+      .from(articles)
+      .leftJoin(articleAuthors, eq(articleAuthors.articleId, articles.id))
+      .leftJoin(volumes, eq(articles.volumeId, volumes.id))
+      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(issues, eq(articles.issueId, issues.id))
+      .where(
+        and(
+          eq(articles.status, 'PUBLISHED'),
+          isNull(articles.deletedAt),
+          or(
+            eq(articleAuthors.authorId, authorId),
+            eq(articles.submitterId, userId)
+          )
+        )
+      )
       .orderBy(desc(articles.publishedAt));
 
     return this.attachAuthorsToArticles(list);
@@ -89,11 +98,11 @@ export class AuthorRepository {
     }));
   }
 
-  async findSubmissionsByAuthorId(authorId: string): Promise<DbSubmission[]> {
+  async findSubmissionsByAuthorId(userId: string): Promise<DbSubmission[]> {
     return db
       .select()
       .from(articles)
-      .where(and(eq(articles.submitterId, authorId), isNull(articles.deletedAt)))
+      .where(and(eq(articles.submitterId, userId), isNull(articles.deletedAt)))
       .orderBy(desc(articles.createdAt));
   }
 }
