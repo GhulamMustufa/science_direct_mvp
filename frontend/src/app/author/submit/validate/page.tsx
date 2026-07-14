@@ -213,7 +213,7 @@ export default function SubmissionValidationPage() {
                 onClick={() => setActiveTab(catName)}
                 className={`flex-1 py-3 px-4 text-center text-sm font-medium border-b-2 transition-all flex items-center justify-center gap-1.5 ${
                   activeTab === catName
-                    ? "border-blue-600 text-blue-600 bg-white dark:bg-zinc-900 dark:border-blue-400"
+                    ? "border-emerald-600 text-emerald-600 bg-white dark:bg-zinc-900 dark:border-emerald-400"
                     : "border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
                 }`}
               >
@@ -303,7 +303,7 @@ export default function SubmissionValidationPage() {
             type="button"
             onClick={handleFinalSubmit}
             disabled={isSubmitting || !report.isValid}
-            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             {isSubmitting ? (
               "Submitting..."

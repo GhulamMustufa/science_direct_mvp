@@ -45,7 +45,7 @@ function ArticleMetadata({ article }: { article: Article }) {
   return (
     <div className="text-xs text-zinc-400 dark:text-zinc-500 space-y-1">
       {article.journalTitle && (
-        <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">
+        <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">
           {article.journalTitle}
           {article.volumeNumber && `, Volume ${article.volumeNumber}`}
           {article.issueNumber && `, Issue ${article.issueNumber}`}
@@ -93,7 +93,7 @@ function CategoryKeywords({ categories, keywords }: { categories: Category[]; ke
             <Link
               key={k.id}
               href={`/search?keyword=${k.name}`}
-              className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950"
+              className="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950"
             >
               {k.name}
             </Link>
@@ -151,7 +151,7 @@ export default async function ArticleDetailPage({
             <BookmarkButton articleId={id} />
             {article.pdfUrl && (
               <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="block">
-                <button className="w-full text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-md py-2.5 shadow-sm transition-all">
+                <button className="w-full text-xs font-semibold bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-700 hover:to-emerald-700 text-white rounded-md py-2.5 shadow-sm transition-all">
                   Download PDF Document
                 </button>
               </a>

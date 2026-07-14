@@ -9,7 +9,7 @@ function PanelCard({ title, desc, href, actionText }: { title: string; desc: str
         <p className="mt-2 text-xs text-zinc-500 leading-relaxed dark:text-zinc-400">{desc}</p>
       </div>
       <Link href={href} className="mt-4">
-        <Button size="sm" className="w-full text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white">
+        <Button size="sm" className="w-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white">
           {actionText}
         </Button>
       </Link>

@@ -164,7 +164,7 @@ export default function AdminSubmissionDetailsPage() {
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between border-b border-zinc-200 pb-6 dark:border-zinc-800">
         <div>
-          <button onClick={() => router.push("/admin/submissions")} className="text-sm text-blue-600 hover:underline mb-2 block">
+          <button onClick={() => router.push("/admin/submissions")} className="text-sm text-emerald-600 hover:underline mb-2 block">
             &larr; Back to List
           </button>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
@@ -187,7 +187,7 @@ export default function AdminSubmissionDetailsPage() {
               href={downloadLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
             >
               Download PDF
             </a>
@@ -209,7 +209,7 @@ export default function AdminSubmissionDetailsPage() {
               <select
                 value={decision}
                 onChange={(e: any) => setDecision(e.target.value)}
-                className="mt-2 block w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500 dark:text-white shadow-sm transition"
+                className="mt-2 block w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-emerald-500 dark:text-white shadow-sm transition"
               >
                 <option value="REVISIONS_REQUIRED">Request Revisions</option>
                 <option value="ACCEPTED">Accept Submission</option>
@@ -293,14 +293,14 @@ export default function AdminSubmissionDetailsPage() {
 
         {/* Published summary banner */}
         {submission.status === "PUBLISHED" && (
-          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-xl p-6 flex flex-col justify-between">
+          <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-xl p-6 flex flex-col justify-between">
             <div>
-              <h2 className="text-lg font-bold text-blue-950 dark:text-blue-400 mb-2">Publication Confirmed</h2>
+              <h2 className="text-lg font-bold text-emerald-950 dark:text-emerald-400 mb-2">Publication Confirmed</h2>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 This manuscript has been successfully published to the platform and is fully indexable.
               </p>
             </div>
-            <div className="mt-4 text-xs space-y-1 text-zinc-700 dark:text-zinc-300 bg-white/40 dark:bg-zinc-950/40 p-3 rounded-lg border border-blue-100/50 dark:border-blue-950/50">
+            <div className="mt-4 text-xs space-y-1 text-zinc-700 dark:text-zinc-300 bg-white/40 dark:bg-zinc-950/40 p-3 rounded-lg border border-emerald-100/50 dark:border-emerald-950/50">
               <p><strong>Status:</strong> Published</p>
               <p className="truncate"><strong>Volume ID:</strong> {submission.volumeId}</p>
             </div>

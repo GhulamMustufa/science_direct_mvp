@@ -57,7 +57,7 @@ export function BookmarkButton({ articleId }: { articleId: string }) {
       onClick={toggleBookmark}
       className={`w-full text-xs font-semibold gap-2 transition-all ${
         isBookmarked 
-          ? "bg-blue-600 text-white hover:bg-blue-700" 
+          ? "bg-emerald-600 text-white hover:bg-emerald-700" 
           : "border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950"
       }`}
     >

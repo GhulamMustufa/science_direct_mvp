@@ -13,7 +13,7 @@ export default function RegisterPage() {
             Or{" "}
             <Link
               href="/login"
-              className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400"
+              className="font-semibold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
             >
               sign in to your existing account
             </Link>

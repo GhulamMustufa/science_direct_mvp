@@ -62,7 +62,7 @@ function SubmissionsTable({ submissions }: { submissions: SubmissionResponse[] }
   if (submissions.length === 0) {
     return (
       <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500 bg-white dark:bg-zinc-900/20">
-        No active submissions. <Link href="/author/submit" className="text-blue-600 hover:underline">Submit a new manuscript.</Link>
+        No active submissions. <Link href="/author/submit" className="text-emerald-600 hover:underline">Submit a new manuscript.</Link>
       </div>
     );
   }
@@ -138,7 +138,7 @@ function SubmissionsTable({ submissions }: { submissions: SubmissionResponse[] }
                 <td className="px-6 py-4 text-right">
                   <Link
                     href={`/author/submissions/${sub.id}`}
-                    className="text-xs font-bold text-blue-650 hover:underline dark:text-blue-400"
+                    className="text-xs font-bold text-emerald-650 hover:underline dark:text-emerald-400"
                   >
                     View Details
                   </Link>
@@ -214,7 +214,7 @@ export default function AuthorDashboardPage() {
               {data.submissions.length > 0 && (
                 <Link
                   href="/author/submit"
-                  className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+                  className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-colors"
                 >
                   <span className="hidden sm:inline">Submit New Manuscript</span>
                   <span className="sm:hidden">Submit</span>

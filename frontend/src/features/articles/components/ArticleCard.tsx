@@ -20,7 +20,7 @@ export function ArticleCard({ article }: { article: Article }) {
     <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
         {article.journalTitle && (
-          <span className="font-semibold text-blue-600 dark:text-blue-400">
+          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
             {article.journalTitle}
           </span>
         )}
@@ -33,7 +33,7 @@ export function ArticleCard({ article }: { article: Article }) {
         <span>{publishedDate}</span>
       </div>
       <Link href={`/articles/${article.id}`} className="mt-2 block group">
-        <h3 className="text-xl font-bold text-zinc-900 group-hover:text-blue-600 dark:text-zinc-100 dark:group-hover:text-blue-400 transition-colors">
+        <h3 className="text-xl font-bold text-zinc-900 group-hover:text-emerald-600 dark:text-zinc-100 dark:group-hover:text-emerald-400 transition-colors">
           {article.title}
         </h3>
       </Link>
@@ -51,7 +51,7 @@ export function ArticleCard({ article }: { article: Article }) {
             href={`https://doi.org/${article.doi}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-mono text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400"
+            className="text-xs font-mono text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400"
           >
             DOI: {article.doi}
           </a>
@@ -60,7 +60,7 @@ export function ArticleCard({ article }: { article: Article }) {
         )}
         <Link
           href={`/articles/${article.id}`}
-          className="text-sm font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400"
+          className="text-sm font-semibold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
         >
           View Full Text →
         </Link>

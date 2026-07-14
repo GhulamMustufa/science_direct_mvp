@@ -38,7 +38,7 @@ function RoleModal({ user, onSave, onClose }: { user: User; onSave: (role: strin
         </select>
         <div className="flex gap-2 justify-end">
           <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>Cancel</Button>
-          <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button size="sm" onClick={handleSave} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white">
             {saving ? "Saving..." : "Save Role"}
           </Button>
         </div>

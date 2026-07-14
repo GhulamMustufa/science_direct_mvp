@@ -274,7 +274,7 @@ export default function SubmitArticlePage() {
                 value={journalId}
                 onChange={(e) => setJournalId(e.target.value)}
                 required
-                className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
               >
                 <option value="" disabled>Select Journal</option>
                 {journals.map(j => (
@@ -290,7 +290,7 @@ export default function SubmitArticlePage() {
               <select
                 value={section}
                 onChange={(e) => setSection(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
               >
                 <option value="" disabled>Select Section</option>
                 <option value="Research Article">Research Article</option>
@@ -307,7 +307,7 @@ export default function SubmitArticlePage() {
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
               >
                 <option value="English">English</option>
                 <option value="Spanish" disabled>Spanish (Coming Soon)</option>
@@ -319,13 +319,13 @@ export default function SubmitArticlePage() {
         <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-6">
           <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-3">
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <User size={20} className="text-blue-600 dark:text-blue-400" />
+              <User size={20} className="text-emerald-600 dark:text-emerald-400" />
               2. Authors
             </h2>
             <button
               type="button"
               onClick={addAuthor}
-              className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+              className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
               <Plus size={16} /> Add Author
             </button>
@@ -345,7 +345,7 @@ export default function SubmitArticlePage() {
                 )}
                 
                 <h3 className="text-sm font-semibold mb-4 text-zinc-800 dark:text-zinc-200">
-                  Author {index + 1} {author.isCorresponding && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">Corresponding</span>}
+                  Author {index + 1} {author.isCorresponding && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">Corresponding</span>}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -355,7 +355,7 @@ export default function SubmitArticlePage() {
                       type="text"
                       value={author.firstName}
                       onChange={(e) => updateAuthor(index, 'firstName', e.target.value)}
-                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
                     />
                   </div>
                   <div>
@@ -364,7 +364,7 @@ export default function SubmitArticlePage() {
                       type="text"
                       value={author.lastName}
                       onChange={(e) => updateAuthor(index, 'lastName', e.target.value)}
-                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
                     />
                   </div>
                   <div>
@@ -373,7 +373,7 @@ export default function SubmitArticlePage() {
                       type="email"
                       value={author.email}
                       onChange={(e) => updateAuthor(index, 'email', e.target.value)}
-                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
                     />
                   </div>
                   <div>
@@ -382,7 +382,7 @@ export default function SubmitArticlePage() {
                       type="text"
                       value={author.affiliation}
                       onChange={(e) => updateAuthor(index, 'affiliation', e.target.value)}
-                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+                      className="block w-full rounded-md border border-zinc-300 px-3 py-1.5 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
                       placeholder="University, Institute, etc."
                     />
                   </div>
@@ -393,7 +393,7 @@ export default function SubmitArticlePage() {
                         checked={author.isCorresponding}
                         onChange={(e) => updateAuthor(index, 'isCorresponding', e.target.checked)}
                         disabled={author.isCorresponding}
-                        className="h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+                        className="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 disabled:opacity-50"
                       />
                       <span className="text-sm text-zinc-700 dark:text-zinc-300">Make Corresponding Author</span>
                     </label>
@@ -418,7 +418,7 @@ export default function SubmitArticlePage() {
                 type="checkbox"
                 checked={checklist.originality}
                 onChange={() => handleCheckboxChange("originality")}
-                className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
               />
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
                 <strong>Originality:</strong> The submission has not been previously published, nor is it before another journal for consideration.
@@ -430,7 +430,7 @@ export default function SubmitArticlePage() {
                 type="checkbox"
                 checked={checklist.format}
                 onChange={() => handleCheckboxChange("format")}
-                className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
               />
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
                 <strong>File Format:</strong> The submission file is in PDF or Word Document (DOCX) file format.
@@ -442,7 +442,7 @@ export default function SubmitArticlePage() {
                 type="checkbox"
                 checked={checklist.references}
                 onChange={() => handleCheckboxChange("references")}
-                className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
               />
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
                 <strong>References:</strong> Where available, URLs or DOIs for the references have been provided.
@@ -454,7 +454,7 @@ export default function SubmitArticlePage() {
                 type="checkbox"
                 checked={checklist.styling}
                 onChange={() => handleCheckboxChange("styling")}
-                className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
               />
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
                 <strong>Style & Layout:</strong> The text is double-spaced; uses a 12-point font; employs italics rather than underlining; and all illustrations, figures, and tables are placed within the text.
@@ -466,7 +466,7 @@ export default function SubmitArticlePage() {
                 type="checkbox"
                 checked={checklist.ethics}
                 onChange={() => handleCheckboxChange("ethics")}
-                className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
               />
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
                 <strong>Ethics & Disclosure:</strong> All authors have read and approved the submission, and declared any potential conflicts of interest.
@@ -488,10 +488,10 @@ export default function SubmitArticlePage() {
               type="file"
               accept=".pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword"
               onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
-              className="mt-2 block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-zinc-800 dark:file:text-zinc-300"
+              className="mt-2 block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-zinc-800 dark:file:text-zinc-300"
             />
             {isLiveValidating && (
-              <p className="text-xs text-blue-500 mt-2 flex items-center gap-1.5 animate-pulse">
+              <p className="text-xs text-emerald-500 mt-2 flex items-center gap-1.5 animate-pulse">
                 Running live manuscript structure check...
               </p>
             )}
@@ -538,7 +538,7 @@ export default function SubmitArticlePage() {
           <button
             type="submit"
             disabled={isSubmitting || !Object.values(checklist).every(Boolean)}
-            className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             {isSubmitting ? "Validating..." : "Validate & Submit"}
           </button>
@@ -597,7 +597,7 @@ export default function SubmitArticlePage() {
                       <button
                         type="button"
                         onClick={() => handleLoadHistory(item)}
-                        className="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-semibold"
+                        className="text-xs text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold"
                       >
                         View Scorecard
                       </button>

@@ -114,7 +114,7 @@ export function RegisterForm() {
       <Button
         type="submit"
         disabled={submitting}
-        className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg shadow-sm font-semibold transition-all mt-4"
+        className="w-full h-11 bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-700 hover:to-emerald-700 text-white rounded-lg shadow-sm font-semibold transition-all mt-4"
       >
         {submitting ? "Creating Account..." : "Create Account"}
       </Button>

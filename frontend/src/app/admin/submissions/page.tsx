@@ -42,7 +42,7 @@ export default function AdminSubmissionsPage() {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="block w-full rounded-md border-zinc-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+            className="block w-full rounded-md border-zinc-300 py-2 pl-3 pr-10 text-base focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
           >
             <option value="SUBMITTED">Pending (SUBMITTED)</option>
             <option value="REVISIONS_REQUIRED">Revisions Required</option>
@@ -96,7 +96,7 @@ export default function AdminSubmissionsPage() {
                   <td className="px-6 py-4 text-right text-sm font-medium">
                     <Link
                       href={`/admin/submissions/${sub.id}`}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                      className="text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300"
                     >
                       Review
                     </Link>

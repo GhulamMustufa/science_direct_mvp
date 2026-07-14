@@ -27,7 +27,7 @@ export default async function IssueDetailPage({
       <div className="mb-6">
         <Link
           href={`/journals/${id}`}
-          className="text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400"
+          className="text-sm font-semibold text-emerald-600 hover:underline dark:text-emerald-400"
         >
           ← Back to Journal Table of Contents
         </Link>

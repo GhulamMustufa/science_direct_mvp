@@ -36,7 +36,7 @@ export function SearchBar() {
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         placeholder="Search by title, abstract, DOI, keywords..."
-        className="h-12 w-full rounded-lg border border-zinc-200 bg-white pl-5 pr-10 text-sm shadow-sm focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+        className="h-12 w-full rounded-lg border border-zinc-200 bg-white pl-5 pr-10 text-sm shadow-sm focus:border-emerald-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
       />
       {inputValue && (
         <button

@@ -45,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               href={link.href}
               className={`block px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
                 isActive
-                  ? "bg-blue-50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400"
+                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400"
                   : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-950"
               }`}
             >

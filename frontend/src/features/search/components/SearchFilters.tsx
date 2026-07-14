@@ -48,7 +48,7 @@ export function SearchFilters() {
         <select
           value={selectedJournal}
           onChange={(e) => updateParam("journalId", e.target.value)}
-          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
         >
           <option value="">All Journals</option>
           {journals.map((j) => (
@@ -62,7 +62,7 @@ export function SearchFilters() {
         <select
           value={selectedVolume}
           onChange={(e) => updateParam("volumeId", e.target.value)}
-          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
         >
           <option value="">All Volumes</option>
           {volumes

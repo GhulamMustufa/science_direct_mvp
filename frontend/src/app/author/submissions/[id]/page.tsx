@@ -106,7 +106,7 @@ export default function SubmissionDetailsPage() {
     return (
       <div className="container mx-auto p-12 text-center">
         <p className="text-red-500 mb-4 whitespace-pre-wrap">{pageError}</p>
-        <button onClick={() => router.push("/author")} className="text-blue-600 hover:underline">
+        <button onClick={() => router.push("/author")} className="text-emerald-600 hover:underline">
           Back to Dashboard
         </button>
       </div>
@@ -118,7 +118,7 @@ export default function SubmissionDetailsPage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12">
       <div className="mb-8">
-        <button onClick={() => router.push("/author")} className="text-sm text-blue-600 hover:underline mb-4 inline-block">
+        <button onClick={() => router.push("/author")} className="text-sm text-emerald-600 hover:underline mb-4 inline-block">
           &larr; Back to Dashboard
         </button>
         <div className="flex items-center justify-between border-b border-zinc-200 pb-6 dark:border-zinc-800">
