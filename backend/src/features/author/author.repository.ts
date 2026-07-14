@@ -7,11 +7,10 @@ import {
   issues,
   volumes,
   journals,
-  submissions,
 } from '../../db/schema/index.js';
 
 export type DbAuthor = typeof authors.$inferSelect;
-export type DbSubmission = typeof submissions.$inferSelect;
+export type DbSubmission = typeof articles.$inferSelect;
 
 export class AuthorRepository {
   /**
@@ -93,9 +92,9 @@ export class AuthorRepository {
   async findSubmissionsByAuthorId(authorId: string): Promise<DbSubmission[]> {
     return db
       .select()
-      .from(submissions)
-      .where(and(eq(submissions.authorId, authorId), isNull(submissions.deletedAt)))
-      .orderBy(desc(submissions.submittedAt));
+      .from(articles)
+      .where(and(eq(articles.submitterId, authorId), isNull(articles.deletedAt)))
+      .orderBy(desc(articles.createdAt));
   }
 }
 

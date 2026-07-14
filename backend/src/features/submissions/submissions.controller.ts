@@ -2,13 +2,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { submissionsService } from './submissions.service.js';
 
-const submitSchema = z.object({
-  title: z.string().min(5).max(500),
-  abstract: z.string().min(10).max(4000),
-  journalId: z.string().uuid().optional(),
-  authorIds: z.union([z.string(), z.array(z.string())]).optional(),
-  additionalAuthors: z.string().max(1000).optional(),
-});
+import { validationService } from './validation/ValidationService.js';
 
 export const submitArticle = async (req: Request, res: Response) => {
   try {
@@ -17,18 +11,21 @@ export const submitArticle = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ error: 'PDF file is required' });
+    const payload = {
+      title: req.body.title,
+      abstract: req.body.abstract,
+      additionalAuthors: req.body.additionalAuthors,
+      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined
+    };
+
+    const validationResult = validationService.validateSubmission(payload);
+    if (!validationResult.isValid) {
+      return res.status(400).json({ error: 'Validation error', details: validationResult.errors });
     }
 
-    const validatedData = submitSchema.parse(req.body);
-    
-    const article = await submissionsService.submitArticle(submitterId, validatedData, req.file);
+    const article = await submissionsService.submitArticle(submitterId, req.body, req.file!);
     res.status(201).json(article);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Validation error', details: error.errors });
-    }
     console.error('Error submitting article:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -58,11 +55,16 @@ export const uploadRevision = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ error: 'Revised PDF file is required' });
+    const payload = {
+      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined
+    };
+
+    const validationResult = validationService.validateRevision(payload);
+    if (!validationResult.isValid) {
+      return res.status(400).json({ error: 'Validation error', details: validationResult.errors });
     }
 
-    const updatedArticle = await submissionsService.uploadRevision(submitterId, articleId, req.file);
+    const updatedArticle = await submissionsService.uploadRevision(submitterId, articleId, req.file!);
     res.json(updatedArticle);
   } catch (error: any) {
     if (error.message === 'Unauthorized') return res.status(403).json({ error: error.message });

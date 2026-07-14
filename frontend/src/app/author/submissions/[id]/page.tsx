@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService, SubmissionResponse } from "@/features/author/services/author.service";
+import { submissionValidator } from '@/features/author/validation/SubmissionValidator';
 
 export default function SubmissionDetailsPage() {
   const router = useRouter();
@@ -45,13 +46,19 @@ export default function SubmissionDetailsPage() {
 
   const handleRevisionUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pdfFile || !submission) return;
+    if (!submission) return;
+
+    const validationResult = submissionValidator.validateRevision({ file: pdfFile });
+    if (!validationResult.isValid) {
+      alert(validationResult.errors.map(err => err.message).join('\n'));
+      return;
+    }
     
     try {
       setUploading(true);
       setError(null);
       const formData = new FormData();
-      formData.append("pdf", pdfFile);
+      formData.append("pdf", pdfFile!);
       
       const updated = await authorService.uploadRevision(submission.id, formData);
       setSubmission(updated);

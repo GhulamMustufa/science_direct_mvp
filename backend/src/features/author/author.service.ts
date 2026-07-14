@@ -47,11 +47,11 @@ export class AuthorService {
       submissions: submissions.map((sub) => ({
         id: sub.id,
         title: sub.title,
-        journalTitle: sub.journalTitle,
+        journalTitle: "Science Direct", // Hardcoded or fetch from relationship if needed
         status: sub.status as SubmissionResponse['status'],
-        submittedAt: sub.submittedAt,
-        lastStatusUpdate: sub.lastStatusUpdate,
-        ojsUrl: sub.ojsUrl,
+        submittedAt: sub.createdAt,
+        lastStatusUpdate: sub.updatedAt,
+        ojsUrl: null,
       })),
       totalViews,
       totalDownloads,

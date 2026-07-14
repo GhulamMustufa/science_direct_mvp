@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService } from "@/features/author/services/author.service";
+import { submissionValidator } from '@/features/author/validation/SubmissionValidator';
 
 export default function SubmitArticlePage() {
   const router = useRouter();
@@ -42,14 +43,17 @@ export default function SubmitArticlePage() {
     e.preventDefault();
     setError(null);
 
-    if (!title || !abstract || !pdfFile) {
-      setError("Please fill out all fields and upload a manuscript file.");
-      return;
-    }
+    const validationResult = submissionValidator.validateSubmission({
+      title,
+      abstract,
+      file: pdfFile,
+      checklist,
+    });
 
-    const allChecked = Object.values(checklist).every(Boolean);
-    if (!allChecked) {
-      setError("You must agree to all the submission checklist requirements to proceed.");
+    if (!validationResult.isValid) {
+      // Just grab the first error for simplicity to match previous behavior, 
+      // or join them. We will join them with newlines.
+      setError(validationResult.errors.map(err => err.message).join('\n'));
       return;
     }
 
@@ -61,7 +65,7 @@ export default function SubmitArticlePage() {
       if (additionalAuthors) {
         formData.append("additionalAuthors", additionalAuthors);
       }
-      formData.append("pdf", pdfFile);
+      formData.append("pdf", pdfFile!);
 
       await authorService.submitArticle(formData);
       router.push("/author"); // Redirect to dashboard

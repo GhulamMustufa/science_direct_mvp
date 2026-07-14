@@ -121,11 +121,13 @@ function SubmissionsTable({ submissions }: { submissions: SubmissionResponse[] }
         </thead>
         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {submissions.map((sub) => {
-            const dateStr = new Date(sub.createdAt || sub.submittedAt).toLocaleDateString("en-US", {
+            const dateVal = sub.createdAt || sub.submittedAt;
+            const dateStr = dateVal ? new Date(dateVal).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
-            });
+            }) : "Unknown Date";
+
             return (
               <tr key={sub.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10">
                 <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-100 max-w-sm truncate">
@@ -181,7 +183,7 @@ export default function AuthorDashboardPage() {
   }, [user, authLoading, router]);
 
   const activeSubmissionsCount = data ? data.submissions.filter(
-    (s) => s.status !== "published" && s.status !== "rejected"
+    (s) => s.status !== "PUBLISHED" && s.status !== "REJECTED"
   ).length : 0;
 
   return (
