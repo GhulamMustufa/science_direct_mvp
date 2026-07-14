@@ -103,7 +103,7 @@ export const uploadRevision = async (req: Request, res: Response) => {
       abstract: existingArticle.abstract,
       section: "Research Article", 
       language: "en",
-      authors: [{ firstName: 'Author', lastName: 'Name', email: 'author@test.com' }],
+      authors: [{ firstName: 'Author', lastName: 'Name', email: 'author@test.com', affiliation: 'Test', isCorresponding: true }],
       file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
       parsedDocument
     };
