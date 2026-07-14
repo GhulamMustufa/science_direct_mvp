@@ -1,5 +1,5 @@
 import { apiFetch, apiFetchWithMeta } from "@/lib/api";
-import { User } from "@/types";
+import { User, Journal } from "@/types";
 
 export interface SyncJobResponse {
   id: string;
@@ -49,6 +49,20 @@ export const adminService = {
     return apiFetch<SubmissionResponse>(`/editorial/submissions/${articleId}/publish`, {
       method: "POST",
       body: JSON.stringify(params),
+    });
+  },
+
+  async createJournal(data: { title: string; description?: string; issn?: string }): Promise<Journal> {
+    return apiFetch<Journal>("/journals", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateJournal(id: string, data: { title?: string; description?: string; issn?: string }): Promise<Journal> {
+    return apiFetch<Journal>(`/journals/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
     });
   },
 };

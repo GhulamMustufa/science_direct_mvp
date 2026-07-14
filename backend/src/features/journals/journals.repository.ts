@@ -199,4 +199,37 @@ export class JournalsRepository {
         })),
     }));
   }
+
+  /**
+   * Create a new journal
+   */
+  async createJournal(data: { title: string; description?: string; issn?: string; ojsJournalId?: string }): Promise<DbJournal> {
+    const result = await db
+      .insert(journals)
+      .values({
+        title: data.title,
+        description: data.description || null,
+        issn: data.issn || null,
+        ojsJournalId: data.ojsJournalId || null,
+      })
+      .returning();
+      
+    return result[0];
+  }
+
+  /**
+   * Update an existing journal
+   */
+  async updateJournal(id: string, data: { title?: string; description?: string; issn?: string }): Promise<DbJournal | null> {
+    const result = await db
+      .update(journals)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(journals.id, id), isNull(journals.deletedAt)))
+      .returning();
+      
+    return result[0] || null;
+  }
 }

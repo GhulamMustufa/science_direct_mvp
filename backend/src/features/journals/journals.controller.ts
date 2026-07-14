@@ -99,4 +99,39 @@ export class JournalsController {
       next(error);
     }
   };
+
+  /**
+   * Handle creating a new journal (Admin only).
+   */
+  createJournal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { title, description, issn, ojsJournalId } = req.body;
+      const data = await this.journalsService.createJournal({ title, description, issn, ojsJournalId });
+
+      res.status(201).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Handle updating an existing journal (Admin only).
+   */
+  updateJournal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { title, description, issn } = req.body;
+      const data = await this.journalsService.updateJournal(id, { title, description, issn });
+
+      res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

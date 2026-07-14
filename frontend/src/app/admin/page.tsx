@@ -42,6 +42,12 @@ export default function AdminOverviewPage() {
           href="/admin/submissions"
           actionText="Manage Submissions"
         />
+        <PanelCard
+          title="Journal Management"
+          desc="Create new journals and edit details like titles, descriptions, and ISSNs."
+          href="/admin/journals"
+          actionText="Manage Journals"
+        />
       </div>
     </div>
   );

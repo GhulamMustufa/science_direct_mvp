@@ -28,6 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin", label: "Overview" },
     { href: "/admin/users", label: "User Management" },
     { href: "/admin/submissions", label: "Editorial Submissions" },
+    { href: "/admin/journals", label: "Journal Management" },
   ];
 
   return (
