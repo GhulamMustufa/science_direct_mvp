@@ -107,7 +107,14 @@ export default function AdminSubmissionDetailsPage() {
       setIsSubmitting(true);
       await adminService.makeDecision(submission.id, decision);
       triggerToast(`Decision "${decision}" saved successfully!`, 'success');
-      router.push('/admin');
+      if (decision === 'ACCEPTED') {
+        const updatedSub = await loadSubmission();
+        if (updatedSub) await loadJournals(updatedSub);
+      } else {
+        setTimeout(() => {
+          router.push('/admin/submissions');
+        }, 1500);
+      }
     } catch (err: any) {
       triggerToast(err.message || "Failed to save decision", 'error');
     } finally {
@@ -135,7 +142,9 @@ export default function AdminSubmissionDetailsPage() {
         });
       }
       triggerToast("Article published successfully!", 'success');
-      router.push('/admin');
+      setTimeout(() => {
+        router.push('/admin/submissions');
+      }, 1500);
     } catch (err: any) {
       triggerToast(err.message || "Failed to publish article", 'error');
     } finally {
@@ -222,22 +231,7 @@ export default function AdminSubmissionDetailsPage() {
           <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900 rounded-xl p-6">
             <h2 className="text-lg font-bold text-emerald-900 dark:text-emerald-400 mb-4">Publish Article</h2>
             <div className="space-y-4">
-              {/* Select Journal */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
-                  Select Journal
-                </label>
-                <select
-                  value={selectedJournalId}
-                  disabled={!!submission?.journalId}
-                  onChange={(e) => handleJournalChange(e.target.value)}
-                  className="mt-2 block w-full rounded-md border border-emerald-200 dark:border-emerald-800/80 bg-white dark:bg-zinc-950 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-emerald-500 dark:text-emerald-100 disabled:opacity-75 transition"
-                >
-                  {journals.map(j => (
-                    <option key={j.id} value={j.id}>{j.title}</option>
-                  ))}
-                </select>
-              </div>
+
 
               {/* Select Volume */}
               <div>
