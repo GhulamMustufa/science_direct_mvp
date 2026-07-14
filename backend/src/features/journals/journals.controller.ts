@@ -44,6 +44,22 @@ export class JournalsController {
   };
 
   /**
+   * Handle fetching all volumes across all journals.
+   */
+  getAllVolumes = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const data = await this.journalsService.getAllVolumes();
+
+      res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * Handle fetching detail of a journal.
    */
   getJournalDetail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

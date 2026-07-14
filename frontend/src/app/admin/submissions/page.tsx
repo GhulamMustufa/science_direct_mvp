@@ -9,7 +9,7 @@ import { TableSkeleton } from "@/components/ui/Loading";
 export default function AdminSubmissionsPage() {
   const [submissions, setSubmissions] = useState<SubmissionResponse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<string>("SUBMITTED");
+  const [filter, setFilter] = useState<string>("ALL");
 
   const loadSubmissions = async () => {
     try {

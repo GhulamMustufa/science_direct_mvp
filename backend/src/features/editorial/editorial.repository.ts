@@ -10,10 +10,14 @@ export class EditorialRepository {
       .orderBy(desc(articles.updatedAt));
   }
 
-  async getAllSubmissions() {
-    return await db.select()
-      .from(articles)
-      .orderBy(desc(articles.updatedAt));
+  async getAllSubmissions(status?: string) {
+    const query = db.select().from(articles);
+    
+    if (status) {
+      query.where(eq(articles.status, status as any));
+    }
+    
+    return await query.orderBy(desc(articles.updatedAt));
   }
 
   async updateSubmissionStatus(articleId: string, status: "DRAFT" | "SUBMITTED" | "REVISIONS_REQUIRED" | "ACCEPTED" | "REJECTED" | "PUBLISHED") {

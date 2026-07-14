@@ -78,6 +78,27 @@ export class JournalsRepository {
   }
 
   /**
+   * Find all active volumes across all journals.
+   */
+  async findAllVolumes(): Promise<(DbVolume & { journalTitle: string | null })[]> {
+    return db
+      .select({
+        id: volumes.id,
+        journalId: volumes.journalId,
+        volumeNumber: volumes.volumeNumber,
+        year: volumes.year,
+        createdAt: volumes.createdAt,
+        updatedAt: volumes.updatedAt,
+        deletedAt: volumes.deletedAt,
+        journalTitle: journals.title,
+      })
+      .from(volumes)
+      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .where(isNull(volumes.deletedAt))
+      .orderBy(desc(volumes.year), desc(volumes.volumeNumber));
+  }
+
+  /**
    * Find a paginated list of active issues belonging to a journal.
    */
   async findIssuesByJournalId(

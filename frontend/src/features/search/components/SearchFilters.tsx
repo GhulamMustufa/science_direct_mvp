@@ -3,26 +3,26 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { searchService } from "../services/search.service";
-import { Journal, Category } from "@/types";
+import { Journal, Volume } from "@/types";
 
 export function SearchFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [journals, setJournals] = useState<Journal[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [volumes, setVolumes] = useState<Volume[]>([]);
 
   const selectedJournal = searchParams.get("journalId") || "";
-  const selectedCategory = searchParams.get("categoryId") || "";
+  const selectedVolume = searchParams.get("volumeId") || "";
 
   useEffect(() => {
     async function loadFilters() {
       try {
-        const [journalsData, categoriesData] = await Promise.all([
+        const [journalsData, volumesData] = await Promise.all([
           searchService.getJournals(),
-          searchService.getCategories(),
+          searchService.getVolumes(),
         ]);
         setJournals(journalsData);
-        setCategories(categoriesData);
+        setVolumes(volumesData);
       } catch (err) {
         console.error("Failed to load search filter options", err);
       }
@@ -58,15 +58,17 @@ export function SearchFilters() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Filter by Category</h3>
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Filter by Volume</h3>
         <select
-          value={selectedCategory}
-          onChange={(e) => updateParam("categoryId", e.target.value)}
+          value={selectedVolume}
+          onChange={(e) => updateParam("volumeId", e.target.value)}
           className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
         >
-          <option value="">All Categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+          <option value="">All Volumes</option>
+          {volumes
+            .filter(v => !selectedJournal || v.journalId === selectedJournal)
+            .map((v) => (
+            <option key={v.id} value={v.id}>Volume {v.volumeNumber} ({v.year})</option>
           ))}
         </select>
       </div>

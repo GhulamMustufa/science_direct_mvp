@@ -14,7 +14,7 @@ export function useSearch(limit = 10) {
 
   const query = searchParams.get("query") || "";
   const journalId = searchParams.get("journalId") || "";
-  const categoryId = searchParams.get("categoryId") || "";
+  const volumeId = searchParams.get("volumeId") || "";
   const keyword = searchParams.get("keyword") || "";
   const page = parseInt(searchParams.get("page") || "1", 10);
 
@@ -26,7 +26,7 @@ export function useSearch(limit = 10) {
       const res = await searchService.searchArticles({
         query,
         journalId,
-        categoryId,
+        volumeId,
         keyword,
         limit,
         offset,
@@ -38,7 +38,7 @@ export function useSearch(limit = 10) {
     } finally {
       setLoading(false);
     }
-  }, [query, journalId, categoryId, keyword, page, limit]);
+  }, [query, journalId, volumeId, keyword, page, limit]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -52,7 +52,7 @@ export function useSearch(limit = 10) {
     error,
     query,
     journalId,
-    categoryId,
+    volumeId,
     keyword,
     page,
     limit,

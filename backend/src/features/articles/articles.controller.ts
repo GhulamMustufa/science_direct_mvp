@@ -29,12 +29,14 @@ export class ArticlesController {
       const { limit, offset } = parsePagination(req.query);
       const query = typeof req.query.query === 'string' ? req.query.query : undefined;
       const journalId = typeof req.query.journalId === 'string' ? req.query.journalId : undefined;
+      const volumeId = typeof req.query.volumeId === 'string' ? req.query.volumeId : undefined;
       const categoryId = typeof req.query.categoryId === 'string' ? req.query.categoryId : undefined;
       const keyword = typeof req.query.keyword === 'string' ? req.query.keyword : undefined;
 
       const { articles: list, total } = await this.articlesService.searchArticles({
         query,
         journalId,
+        volumeId,
         categoryId,
         keyword,
         limit,

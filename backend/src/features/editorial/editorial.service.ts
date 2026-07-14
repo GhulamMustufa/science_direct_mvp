@@ -5,8 +5,8 @@ export class EditorialService {
     return await editorialRepository.getPendingSubmissions();
   }
 
-  async getAllSubmissions() {
-    return await editorialRepository.getAllSubmissions();
+  async getAllSubmissions(status?: string) {
+    return await editorialRepository.getAllSubmissions(status);
   }
 
   async makeDecision(articleId: string, decision: 'ACCEPTED' | 'REJECTED' | 'REVISIONS_REQUIRED') {

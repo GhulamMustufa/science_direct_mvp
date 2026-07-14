@@ -18,6 +18,7 @@ export type DbArticle = typeof articles.$inferSelect;
 export interface SearchOptions {
   query?: string;
   journalId?: string;
+  volumeId?: string;
   categoryId?: string;
   keyword?: string;
   limit: number;
@@ -34,12 +35,16 @@ export class ArticlesRepository {
 
     if (options.query && options.query.trim()) {
       const q = options.query.trim();
-      conditions.push(sql`articles.search_vector @@ plainto_tsquery('english', ${q})`);
-      searchRank = sql`ts_rank(articles.search_vector, plainto_tsquery('english', ${q}))`;
+      conditions.push(sql`to_tsvector('english', coalesce(${articles.title}, '') || ' ' || coalesce(${articles.abstract}, '')) @@ plainto_tsquery('english', ${q})`);
+      searchRank = sql`ts_rank(to_tsvector('english', coalesce(${articles.title}, '') || ' ' || coalesce(${articles.abstract}, '')), plainto_tsquery('english', ${q}))`;
     }
 
     if (options.journalId) {
       conditions.push(eq(volumes.journalId, options.journalId));
+    }
+
+    if (options.volumeId) {
+      conditions.push(eq(articles.volumeId, options.volumeId));
     }
 
     this.applyRelationshipFilters(conditions, options);

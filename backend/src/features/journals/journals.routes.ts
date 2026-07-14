@@ -12,6 +12,7 @@ const journalsService = new JournalsService(journalsRepository);
 const journalsController = new JournalsController(journalsService);
 
 router.get('/journals', journalsController.getJournals);
+router.get('/volumes', journalsController.getAllVolumes);
 router.get('/journals/:id', journalsController.getJournalDetail);
 router.get('/journals/:id/issues', journalsController.getIssuesForJournal);
 router.get('/issues/:id', journalsController.getIssueDetail);

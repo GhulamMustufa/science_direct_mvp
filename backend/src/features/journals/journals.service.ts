@@ -22,6 +22,13 @@ export class JournalsService {
   }
 
   /**
+   * Get all active volumes across all journals.
+   */
+  async getAllVolumes() {
+    return this.journalsRepository.findAllVolumes();
+  }
+
+  /**
    * Get detail metadata of a journal with its associated volumes.
    */
   async getJournalDetail(id: string): Promise<JournalDetailResponse> {

@@ -17,8 +17,8 @@ export const getSubmissions = async (req: Request, res: Response) => {
   try {
     const status = req.query.status as string;
     let submissions;
-    if (status === 'SUBMITTED') {
-      submissions = await editorialService.getPendingSubmissions();
+    if (status) {
+      submissions = await editorialService.getAllSubmissions(status);
     } else {
       submissions = await editorialService.getAllSubmissions();
     }
