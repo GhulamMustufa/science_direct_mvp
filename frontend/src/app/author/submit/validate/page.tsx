@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService } from "@/features/author/services/author.service";
 import { CheckCircle2, AlertTriangle, XCircle, ArrowLeft, Send, Clock, FileText } from "lucide-react";
+import { FormPageSkeleton } from "@/components/ui/Loading";
 
 interface ValidationIssue {
   field: string;
@@ -55,14 +56,14 @@ export default function SubmissionValidationPage() {
     }
   }, [router]);
 
-  if (authLoading) return <div className="p-8 text-center">Loading...</div>;
+  if (authLoading) return <FormPageSkeleton />;
   if (!user) {
     router.push("/login");
     return null;
   }
 
   if (!report) {
-    return <div className="p-8 text-center text-zinc-500">Loading validation report...</div>;
+    return <FormPageSkeleton />;
   }
 
   const getFileFromIndexedDB = async (): Promise<File | null> => {

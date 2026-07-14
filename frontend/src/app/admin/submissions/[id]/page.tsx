@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { adminService } from "@/features/admin/services/admin.service";
 import { journalsService } from "@/features/journals/services/journals.service";
 import { SubmissionResponse } from "@/features/author/services/author.service";
+import { SubmissionDetailSkeleton } from "@/components/ui/Loading";
 
 export default function AdminSubmissionDetailsPage() {
   const router = useRouter();
@@ -142,7 +143,7 @@ export default function AdminSubmissionDetailsPage() {
     }
   };
 
-  if (loading) return <div className="text-center py-12 text-zinc-500">Loading...</div>;
+  if (loading) return <SubmissionDetailSkeleton />;
   if (error || !submission) return <div className="text-center py-12 text-red-500">{error}</div>;
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';

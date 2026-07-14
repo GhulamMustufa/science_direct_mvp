@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { adminService } from "@/features/admin/services/admin.service";
 import { SubmissionResponse } from "@/features/author/services/author.service";
+import { TableSkeleton } from "@/components/ui/Loading";
 
 export default function AdminSubmissionsPage() {
   const [submissions, setSubmissions] = useState<SubmissionResponse[]>([]);
@@ -54,7 +55,7 @@ export default function AdminSubmissionsPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-zinc-500">Loading...</div>
+        <TableSkeleton rows={5} />
       ) : submissions.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500">
           No submissions found for this filter.

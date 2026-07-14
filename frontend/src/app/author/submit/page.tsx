@@ -7,6 +7,7 @@ import { authorService } from "@/features/author/services/author.service";
 import { journalsService } from "@/features/journals/services/journals.service";
 import { Journal } from "@/types";
 import { Plus, X, User, ShieldCheck, ShieldAlert, History, FileText } from "lucide-react";
+import { FormPageSkeleton } from "@/components/ui/Loading";
 
 export interface AuthorData {
   firstName: string;
@@ -114,7 +115,7 @@ export default function SubmitArticlePage() {
     return () => clearTimeout(delayDebounce);
   }, [pdfFile, section, language, authors, authLoading, user]);
 
-  if (authLoading) return <div className="p-8 text-center">Loading...</div>;
+  if (authLoading) return <FormPageSkeleton />;
   if (!user) {
     router.push("/login");
     return null;

@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService, SubmissionResponse } from "@/features/author/services/author.service";
 import { CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { SubmissionDetailSkeleton } from "@/components/ui/Loading";
 
 export default function SubmissionDetailsPage() {
   const router = useRouter();
@@ -98,7 +99,7 @@ export default function SubmissionDetailsPage() {
   };
 
   if (authLoading || loading) {
-    return <div className="container mx-auto p-12 text-center text-zinc-500">Loading submission...</div>;
+    return <SubmissionDetailSkeleton />;
   }
 
   if (pageError || !submission) {
