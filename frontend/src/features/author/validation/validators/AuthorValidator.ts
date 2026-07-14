@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { Validator } from '../Validator.js';
-import { ValidationResult } from '../ValidationResult.js';
+import { Validator } from '../Validator';
+import { ValidationResult } from '../ValidationResult';
 
 export interface AuthorData {
   firstName: string;
@@ -33,7 +33,7 @@ export class AuthorValidator implements Validator<AuthorData[] | undefined> {
     if (!result.success) {
       return {
         isValid: false,
-        errors: result.error.errors.map(e => ({ field: 'authors', message: e.message }))
+        errors: result.error.issues.map(e => ({ field: 'authors', message: e.message }))
       };
     }
 

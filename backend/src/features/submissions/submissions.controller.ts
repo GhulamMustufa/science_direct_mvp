@@ -4,18 +4,35 @@ import { submissionsService } from './submissions.service.js';
 
 import { validationService } from './validation/ValidationService.js';
 
+import { documentParserService } from './parser/DocumentParserService.js';
+
 export const submitArticle = async (req: Request, res: Response) => {
   try {
     const submitterId = req.user?.id; // Assuming auth middleware sets req.user
     if (!submitterId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
+    
+    let parsedDocument;
+    if (req.file) {
+      try {
+        const fs = await import('fs/promises');
+        const buffer = await fs.readFile(req.file.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+      } catch (err) {
+        console.error('Document parsing error:', err);
+      }
+    }
 
     const payload = {
       title: req.body.title,
       abstract: req.body.abstract,
-      additionalAuthors: req.body.additionalAuthors,
-      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined
+      section: req.body.section,
+      language: req.body.language,
+      authors: req.body.authors ? JSON.parse(req.body.authors) : undefined,
+      keywords: req.body.keywords ? JSON.parse(req.body.keywords) : undefined,
+      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      parsedDocument
     };
 
     const validationResult = validationService.validateSubmission(payload);
