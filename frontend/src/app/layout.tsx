@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ScienceDirect MVP - Discover Research & Publications",
-  description: "A modern peer-review publication discovery system and reader dashboard.",
+  title: "International Journal of Biochemical and Allied Health Research (IJBAHR)",
+  description: "A peer-reviewed platform dedicated to publishing high-quality research that connects basic Biochemical science with Medical and Allied Health.",
 };
 
 export default function RootLayout({

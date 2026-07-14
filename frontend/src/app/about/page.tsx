@@ -1,23 +1,24 @@
 import { User, ShieldCheck, GraduationCap } from "lucide-react";
+import Image from "next/image";
 
 const editorialBoard = [
-  { name: "Prof. Syed A Aziz", affiliation: "Faculty of Medicine, Department of Pathology and Lab Medicine, University of Ottawa, Canada." },
-  { name: "Prof. Bilquees Gul", affiliation: "Ex Director, Dr Ajmal Khan Institute of Sustainable Halophytes Utilization, University of Karachi" },
-  { name: "Prof. Maqsood Ansari", affiliation: "Department of Genetics, University of Karachi" },
-  { name: "Prof. Hamida Nusrat", affiliation: "PhD, PHM, SM(ASCP), MLS(ASCPi), TS(ABB), Professor, UC Berkeley, California USA." },
-  { name: "Prof. Urszula Guzik", affiliation: "Department of Biochemistry, Faculty of Biology and Environmental Protection, University of Silesia, Katowice. Poland" },
-  { name: "Dr. Raffat Sultana", affiliation: "Executive Director, Karachi Institute of Heart Diseases" },
-  { name: "Prof. Zamin Shaheed Siddiqui", affiliation: "MAHQ Biological Research Centre, University of Karachi, Pakistan" },
-  { name: "Prof. Tabassum Mahboob", affiliation: "Meritorious Professor of Biochemistry, former Dean Faculty of Science, University of Karachi" },
-  { name: "Prof. S. M. Shahid", affiliation: "School of Health Science Eastern Institute of Technology, Auckland University, New Zealand" },
-  { name: "Prof. Farah Jabeen", affiliation: "Department of Biochemistry, Jinnah Women University for Women, Karachi, Pakistan" },
-  { name: "Prof. Shamim A Qureshi", affiliation: "Department of Biochemistry, University of Karachi, Pakistan." },
-  { name: "Prof. Afsheen Aman", affiliation: "The Karachi institute of Biotechnology and Genetic Engineering (KIBGE). University of Karachi, Pakistan." },
-  { name: "Prof. Junaid Mahmood Alam", affiliation: "Head of clinical biochemistry and chemical Pathology lab services, Liaquat National Hospital and medical college, Karachi" },
-  { name: "Prof. Qudsia Tariq", affiliation: "Department of Psychology, University of Karachi, Pakistan." },
-  { name: "Prof. Zaheer Ul Haq", affiliation: "Dr. Panjwani Center for Molecular Medicine & Drug Research (ICCBS). University of Karachi, Pakistan." },
-  { name: "Prof. Aliya Riaz", affiliation: "Department of Biochemistry, Jinnah University for Women, Karachi, Pakistan" },
-  { name: "Dr. Muhammad Asif Nawaz", affiliation: "Department of Biotechnology, Shaheed Benazir Bhutto University, KPK, Pakistan." }
+  { name: "Prof. Syed A Aziz", affiliation: "Faculty of Medicine, Department of Pathology and Lab Medicine, University of Ottawa, Canada.", image: "/images/editorial/syed_a_aziz.jpeg" },
+  { name: "Prof. Bilquees Gul", affiliation: "Ex Director, Dr Ajmal Khan Institute of Sustainable Halophytes Utilization, University of Karachi", image: "/images/editorial/bilquees_gul.jpeg" },
+  { name: "Prof. Maqsood Ansari", affiliation: "Department of Genetics, University of Karachi", image: "/images/editorial/maqsood_ansari.jpeg" },
+  { name: "Prof. Hamida Nusrat", affiliation: "PhD, PHM, SM(ASCP), MLS(ASCPi), TS(ABB), Professor, UC Berkeley, California USA.", image: "/images/editorial/hamida_nusrat.jpeg" },
+  { name: "Prof. Urszula Guzik", affiliation: "Department of Biochemistry, Faculty of Biology and Environmental Protection, University of Silesia, Katowice. Poland", image: "/images/editorial/urszula_guzik.jpg" },
+  { name: "Dr. Raffat Sultana", affiliation: "Executive Director, Karachi Institute of Heart Diseases", image: "/images/editorial/raffat_sultana.png" },
+  { name: "Prof. Zamin Shaheed Siddiqui", affiliation: "MAHQ Biological Research Centre, University of Karachi, Pakistan", image: "/images/editorial/zamin_shaheed_siddiqui.jpeg" },
+  { name: "Prof. Tabassum Mahboob", affiliation: "Meritorious Professor of Biochemistry, former Dean Faculty of Science, University of Karachi", image: "/images/editorial/tabassum_mahboob.jpeg" },
+  { name: "Prof. S. M. Shahid", affiliation: "School of Health Science Eastern Institute of Technology, Auckland University, New Zealand", image: "/images/editorial/s_m_shahid.jpeg" },
+  { name: "Prof. Farah Jabeen", affiliation: "Department of Biochemistry, Jinnah Women University for Women, Karachi, Pakistan", image: "/images/editorial/farah_jabeen.jpeg" },
+  { name: "Prof. Shamim A Qureshi", affiliation: "Department of Biochemistry, University of Karachi, Pakistan.", image: "/images/editorial/shamim_a_qureshi.jpeg" },
+  { name: "Prof. Afsheen Aman", affiliation: "The Karachi institute of Biotechnology and Genetic Engineering (KIBGE). University of Karachi, Pakistan.", image: "/images/editorial/afsheen_aman.png" },
+  { name: "Prof. Junaid Mahmood Alam", affiliation: "Head of clinical biochemistry and chemical Pathology lab services, Liaquat National Hospital and medical college, Karachi", image: "/images/editorial/junaid_mahmood_alam.jpeg" },
+  { name: "Prof. Qudsia Tariq", affiliation: "Department of Psychology, University of Karachi, Pakistan.", image: "/images/editorial/qudsia_tariq.jpeg" },
+  { name: "Prof. Zaheer Ul Haq", affiliation: "Dr. Panjwani Center for Molecular Medicine & Drug Research (ICCBS). University of Karachi, Pakistan.", image: "/images/editorial/zaheer_ul_haq.jpeg" },
+  { name: "Prof. Aliya Riaz", affiliation: "Department of Biochemistry, Jinnah University for Women, Karachi, Pakistan", image: "/images/editorial/aliya_riaz.jpeg" },
+  { name: "Dr. Muhammad Asif Nawaz", affiliation: "Department of Biotechnology, Shaheed Benazir Bhutto University, KPK, Pakistan.", image: "/images/editorial/muhammad_asif_nawaz.jpeg" }
 ];
 
 const advisoryBoard = [
@@ -43,11 +44,15 @@ const advisoryBoard = [
   { name: "Mr. Mohsin Khan", affiliation: "Ohio University Athens, USA" }
 ];
 
-function ProfileCard({ name, affiliation }: { name: string, affiliation: string }) {
+function ProfileCard({ name, affiliation, image }: { name: string, affiliation: string, image?: string }) {
   return (
     <div className="flex flex-col items-center text-center p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="h-24 w-24 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 text-zinc-400 dark:text-zinc-500">
-        <User size={32} />
+      <div className="h-24 w-24 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 text-zinc-400 dark:text-zinc-500 overflow-hidden relative">
+        {image ? (
+          <Image src={image} alt={name} fill className="object-cover" />
+        ) : (
+          <User size={32} />
+        )}
       </div>
       <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">{name}</h3>
       <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{affiliation}</p>
@@ -78,6 +83,7 @@ export default function AboutPage() {
           <ProfileCard 
             name="Prof. Shah Ali Ul Qader" 
             affiliation="University of Karachi, Pakistan" 
+            image="/images/editorial/shah_ali_ul_qader.jpeg"
           />
         </div>
       </section>
@@ -90,7 +96,7 @@ export default function AboutPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {editorialBoard.map((member, index) => (
-            <ProfileCard key={index} name={member.name} affiliation={member.affiliation} />
+            <ProfileCard key={index} name={member.name} affiliation={member.affiliation} image={member.image} />
           ))}
         </div>
       </section>
