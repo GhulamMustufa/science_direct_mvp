@@ -122,6 +122,11 @@ export class ArticlesController {
         downloadUrl = downloadUrl.replace('/article/view/', '/article/download/');
       }
 
+      // If it's a relative URL (like /uploads/...), make it absolute so node-fetch doesn't crash
+      if (downloadUrl.startsWith('/')) {
+        downloadUrl = `${req.protocol}://${req.get('host')}${downloadUrl}`;
+      }
+
       let pdfRes = await fetch(downloadUrl);
       let contentType = pdfRes.headers.get('content-type') || '';
 

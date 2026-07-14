@@ -40,6 +40,7 @@ export default function AdminSubmissionDetailsPage() {
       const found = subs.find(s => s.id === params.id);
       if (found) {
         setSubmission(found);
+        return found;
       } else {
         setError("Submission not found");
       }
@@ -48,15 +49,19 @@ export default function AdminSubmissionDetailsPage() {
     } finally {
       setLoading(false);
     }
+    return null;
   };
 
-  const loadJournals = async () => {
+  const loadJournals = async (sub: any) => {
     try {
       const list = await journalsService.getJournals();
       setJournals(list);
-      if (list.length > 0) {
-        setSelectedJournalId(list[0].id);
-        const details = await journalsService.getJournalDetail(list[0].id);
+      
+      const targetJournalId = sub.journalId || (list.length > 0 ? list[0].id : null);
+      
+      if (targetJournalId) {
+        setSelectedJournalId(targetJournalId);
+        const details = await journalsService.getJournalDetail(targetJournalId);
         setVolumesList(details.volumes || []);
         if (details.volumes && details.volumes.length > 0) {
           setSelectedVolumeId(details.volumes[0].id);
@@ -70,8 +75,13 @@ export default function AdminSubmissionDetailsPage() {
   };
 
   useEffect(() => {
-    loadSubmission();
-    loadJournals();
+    const init = async () => {
+      const sub = await loadSubmission();
+      if (sub) {
+        await loadJournals(sub);
+      }
+    };
+    init();
   }, [params.id]);
 
   const handleJournalChange = async (journalId: string) => {
@@ -96,7 +106,7 @@ export default function AdminSubmissionDetailsPage() {
       setIsSubmitting(true);
       await adminService.makeDecision(submission.id, decision);
       triggerToast(`Decision "${decision}" saved successfully!`, 'success');
-      await loadSubmission();
+      router.push('/admin');
     } catch (err: any) {
       triggerToast(err.message || "Failed to save decision", 'error');
     } finally {
@@ -124,8 +134,7 @@ export default function AdminSubmissionDetailsPage() {
         });
       }
       triggerToast("Article published successfully!", 'success');
-      await loadSubmission();
-      await loadJournals();
+      router.push('/admin');
     } catch (err: any) {
       triggerToast(err.message || "Failed to publish article", 'error');
     } finally {
@@ -219,8 +228,9 @@ export default function AdminSubmissionDetailsPage() {
                 </label>
                 <select
                   value={selectedJournalId}
+                  disabled={!!submission?.journalId}
                   onChange={(e) => handleJournalChange(e.target.value)}
-                  className="mt-2 block w-full rounded-md border border-emerald-200 dark:border-emerald-800/80 bg-white dark:bg-zinc-950 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-emerald-500 dark:text-emerald-100 transition"
+                  className="mt-2 block w-full rounded-md border border-emerald-200 dark:border-emerald-800/80 bg-white dark:bg-zinc-950 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-emerald-500 dark:text-emerald-100 disabled:opacity-75 transition"
                 >
                   {journals.map(j => (
                     <option key={j.id} value={j.id}>{j.title}</option>

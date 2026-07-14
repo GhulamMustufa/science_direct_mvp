@@ -47,5 +47,12 @@ export const authorService = {
       method: 'POST',
       body: formData
     });
+  },
+
+  async validateRevision(articleId: string, formData: FormData): Promise<any> {
+    return apiFetch<any>(`/submissions/${articleId}/revisions/validate`, {
+      method: 'POST',
+      body: formData
+    });
   }
 };

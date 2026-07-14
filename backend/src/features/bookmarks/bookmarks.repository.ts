@@ -20,7 +20,8 @@ export class BookmarksRepository {
     const baseWhere = and(
       eq(bookmarks.userId, userId),
       isNull(bookmarks.deletedAt),
-      isNull(articles.deletedAt)
+      isNull(articles.deletedAt),
+      eq(articles.status, 'PUBLISHED')
     );
 
     const list = await db
@@ -107,7 +108,7 @@ export class BookmarksRepository {
     const result = await db
       .select({ id: articles.id })
       .from(articles)
-      .where(and(eq(articles.id, articleId), isNull(articles.deletedAt)))
+      .where(and(eq(articles.id, articleId), eq(articles.status, 'PUBLISHED'), isNull(articles.deletedAt)))
       .limit(1);
 
     return result[0] || null;

@@ -29,7 +29,7 @@ export class ArticlesRepository {
    * Find articles using PostgreSQL full-text search with filtering and pagination.
    */
   async findArticles(options: SearchOptions) {
-    const conditions = [isNull(articles.deletedAt)];
+    const conditions: any[] = [isNull(articles.deletedAt), eq(articles.status, 'PUBLISHED')];
     let searchRank: any = null;
 
     if (options.query && options.query.trim()) {
@@ -188,7 +188,7 @@ export class ArticlesRepository {
       .leftJoin(volumes, eq(articles.volumeId, volumes.id))
       .leftJoin(journals, eq(volumes.journalId, journals.id))
       .leftJoin(issues, eq(articles.issueId, issues.id))
-      .where(and(eq(articles.id, id), isNull(articles.deletedAt)))
+      .where(and(eq(articles.id, id), eq(articles.status, 'PUBLISHED'), isNull(articles.deletedAt)))
       .limit(1);
 
     return result[0] || null;

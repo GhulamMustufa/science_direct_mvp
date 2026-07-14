@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService, SubmissionResponse } from "@/features/author/services/author.service";
+import { CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
 
 export default function SubmissionDetailsPage() {
   const router = useRouter();
@@ -15,7 +16,10 @@ export default function SubmissionDetailsPage() {
   
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [validating, setValidating] = useState(false);
+  const [validationReport, setValidationReport] = useState<any>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -31,10 +35,10 @@ export default function SubmissionDetailsPage() {
         if (found) {
           setSubmission(found);
         } else {
-          setError("Submission not found");
+          setPageError("Submission not found");
         }
       } catch (err: any) {
-        setError("Error loading submission details");
+        setPageError("Error loading submission details");
       } finally {
         setLoading(false);
       }
@@ -42,6 +46,29 @@ export default function SubmissionDetailsPage() {
     
     fetchSubmission();
   }, [user, authLoading, params.id, router]);
+
+  useEffect(() => {
+    if (!pdfFile || !submission) {
+      setValidationReport(null);
+      return;
+    }
+    const runValidation = async () => {
+      setValidating(true);
+      setUploadError(null);
+      try {
+        const formData = new FormData();
+        formData.append("pdf", pdfFile);
+        const report = await authorService.validateRevision(submission.id, formData);
+        setValidationReport(report);
+      } catch (err: any) {
+        setUploadError(err.message || "Failed to validate file");
+        setValidationReport(null);
+      } finally {
+        setValidating(false);
+      }
+    };
+    runValidation();
+  }, [pdfFile, submission]);
 
   const handleRevisionUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +81,7 @@ export default function SubmissionDetailsPage() {
     
     try {
       setUploading(true);
-      setError(null);
+      setUploadError(null);
       const formData = new FormData();
       formData.append("pdf", pdfFile!);
       
@@ -64,7 +91,7 @@ export default function SubmissionDetailsPage() {
       
       // Optionally show a success toast here
     } catch (err: any) {
-      setError(err.message || "Failed to upload revision");
+      setUploadError(err.message || "Failed to upload revision");
     } finally {
       setUploading(false);
     }
@@ -74,10 +101,10 @@ export default function SubmissionDetailsPage() {
     return <div className="container mx-auto p-12 text-center text-zinc-500">Loading submission...</div>;
   }
 
-  if (error || !submission) {
+  if (pageError || !submission) {
     return (
       <div className="container mx-auto p-12 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
+        <p className="text-red-500 mb-4 whitespace-pre-wrap">{pageError}</p>
         <button onClick={() => router.push("/author")} className="text-blue-600 hover:underline">
           Back to Dashboard
         </button>
@@ -124,6 +151,13 @@ export default function SubmissionDetailsPage() {
             The editorial team has requested revisions for your manuscript. Please upload the updated PDF below.
           </p>
           
+          {uploadError && (
+            <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm whitespace-pre-wrap">
+              <strong>Upload Failed:</strong><br />
+              {uploadError}
+            </div>
+          )}
+
           <form onSubmit={handleRevisionUpload} className="space-y-4">
             <div>
               <input
@@ -134,9 +168,55 @@ export default function SubmissionDetailsPage() {
                 className="block w-full text-sm text-amber-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 dark:file:bg-amber-900 dark:file:text-amber-200"
               />
             </div>
+
+            {validating && (
+              <div className="flex items-center space-x-2 text-sm text-amber-600">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Validating file structure...</span>
+              </div>
+            )}
+
+            {validationReport && !validating && (
+              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-900 text-sm">
+                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 border-b border-zinc-200 dark:border-zinc-800 font-semibold text-zinc-700 dark:text-zinc-300">
+                  Validation Results
+                </div>
+                <div className="p-4 space-y-4">
+                  {['File', 'Structure'].map((cat) => {
+                    const category = validationReport.categories[cat];
+                    if (!category) return null;
+                    const hasErrors = category.issues.some((i: any) => i.severity === 'error');
+                    const hasWarnings = category.issues.some((i: any) => i.severity === 'warning');
+                    return (
+                      <div key={cat} className="space-y-2">
+                        <div className="flex items-center space-x-2 font-medium">
+                          {hasErrors ? <XCircle className="w-4 h-4 text-red-500" /> : 
+                           hasWarnings ? <AlertTriangle className="w-4 h-4 text-amber-500" /> : 
+                           <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                          <span className={hasErrors ? "text-red-700 dark:text-red-400" : hasWarnings ? "text-amber-700 dark:text-amber-400" : "text-emerald-700 dark:text-emerald-400"}>{cat} Checks</span>
+                        </div>
+                        {category.issues.length > 0 && (
+                          <ul className="pl-6 space-y-1">
+                            {category.issues.map((issue: any, idx: number) => (
+                              <li key={idx} className={`text-xs ${issue.severity === 'error' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                &bull; {issue.message} ({issue.field})
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {category.issues.length === 0 && (
+                          <p className="pl-6 text-xs text-zinc-500">All checks passed.</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={uploading || !pdfFile}
+              disabled={uploading || !pdfFile || validating || (validationReport && ['File', 'Structure'].some(cat => validationReport.categories[cat]?.issues?.some((i: any) => i.severity === 'error')))}
               className="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-md hover:bg-amber-700 disabled:opacity-50"
             >
               {uploading ? "Uploading..." : "Upload Revision"}

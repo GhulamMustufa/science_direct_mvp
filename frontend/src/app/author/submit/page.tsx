@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorService } from "@/features/author/services/author.service";
+import { journalsService } from "@/features/journals/services/journals.service";
+import { Journal } from "@/types";
 import { Plus, X, User, ShieldCheck, ShieldAlert, History, FileText } from "lucide-react";
 
 export interface AuthorData {
@@ -19,6 +21,8 @@ export default function SubmitArticlePage() {
   const { user, loading: authLoading } = useAuth();
   
   const [section, setSection] = useState("");
+  const [journalId, setJournalId] = useState("");
+  const [journals, setJournals] = useState<Journal[]>([]);
   const [language, setLanguage] = useState("English");
 
   const [authors, setAuthors] = useState<AuthorData[]>([{
@@ -48,6 +52,37 @@ export default function SubmitArticlePage() {
     // Load history on mount
     const history = JSON.parse(localStorage.getItem("validation_history") || "[]");
     setHistoryList(history);
+    
+    // Load journals
+    journalsService.getJournals().then(setJournals).catch(console.error);
+
+    // Restore form data if returning from validation page
+    const savedForm = sessionStorage.getItem("lastValidationFormData");
+    if (savedForm) {
+      try {
+        const parsed = JSON.parse(savedForm);
+        if (parsed.section) setSection(parsed.section);
+        if (parsed.journalId) setJournalId(parsed.journalId);
+        if (parsed.language) setLanguage(parsed.language);
+        if (parsed.authors) setAuthors(parsed.authors);
+        if (parsed.checklist) setChecklist(parsed.checklist);
+        
+        // Try restoring PDF file from IndexedDB
+        const request = indexedDB.open('SubmissionDB', 1);
+        request.onsuccess = () => {
+          const db = request.result;
+          if (db.objectStoreNames.contains('files')) {
+            const tx = db.transaction('files', 'readonly');
+            const getReq = tx.objectStore('files').get('draftFile');
+            getReq.onsuccess = () => {
+              if (getReq.result) setPdfFile(getReq.result);
+            };
+          }
+        };
+      } catch (e) {
+        console.error("Failed to parse saved form data", e);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -61,6 +96,7 @@ export default function SubmitArticlePage() {
       setLiveError(null);
       try {
         const formData = new FormData();
+        formData.append("journalId", journalId);
         formData.append("section", section);
         formData.append("language", language);
         formData.append("authors", JSON.stringify(authors));
@@ -157,6 +193,7 @@ export default function SubmitArticlePage() {
 
       // Save form inputs to sessionStorage
       const formDataObj = {
+        journalId,
         section,
         language,
         authors,
@@ -166,6 +203,7 @@ export default function SubmitArticlePage() {
       sessionStorage.setItem("lastValidationFileName", pdfFile.name);
 
       const formData = new FormData();
+      formData.append("journalId", journalId);
       formData.append("section", section);
       formData.append("language", language);
       formData.append("authors", JSON.stringify(authors));
@@ -227,6 +265,23 @@ export default function SubmitArticlePage() {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="col-span-1">
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Target Journal <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={journalId}
+                onChange={(e) => setJournalId(e.target.value)}
+                required
+                className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:text-sm"
+              >
+                <option value="" disabled>Select Journal</option>
+                {journals.map(j => (
+                  <option key={j.id} value={j.id}>{j.title}</option>
+                ))}
+              </select>
+            </div>
+
             <div className="col-span-1">
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Journal Section <span className="text-red-500">*</span>

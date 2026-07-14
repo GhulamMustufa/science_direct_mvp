@@ -209,7 +209,18 @@ export default function AuthorDashboardPage() {
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Active Submissions</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Active Submissions</h2>
+              {data.submissions.length > 0 && (
+                <Link
+                  href="/author/submit"
+                  className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+                >
+                  <span className="hidden sm:inline">Submit New Manuscript</span>
+                  <span className="sm:hidden">Submit</span>
+                </Link>
+              )}
+            </div>
             <SubmissionsTable submissions={data.submissions} />
           </div>
 

@@ -25,19 +25,12 @@ export class AuthorService {
    */
   async getAuthorDashboard(userId: string): Promise<AuthorDashboardResponse> {
     const author = await this.authorRepository.findAuthorByUserId(userId);
-    if (!author) {
-      return {
-        publications: [],
-        submissions: [],
-        totalViews: 0,
-        totalDownloads: 0,
-      };
-    }
-
-    const [publications, submissions] = await Promise.all([
-      this.authorRepository.findPublicationsByAuthorId(author.id, userId),
-      this.authorRepository.findSubmissionsByAuthorId(userId),
-    ]);
+    const submissions = await this.authorRepository.findSubmissionsByAuthorId(userId);
+    
+    const publications = await this.authorRepository.findPublicationsByAuthorId(
+      author ? author.id : null, 
+      userId
+    );
 
     const totalViews = publications.reduce((acc, curr) => acc + (curr.views || 0), 0);
     const totalDownloads = publications.reduce((acc, curr) => acc + (curr.downloads || 0), 0);

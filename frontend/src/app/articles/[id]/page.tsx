@@ -150,7 +150,7 @@ export default async function ArticleDetailPage({
             <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Article Actions</h3>
             <BookmarkButton articleId={id} />
             {article.pdfUrl && (
-              <a href={downloadUrl} className="block">
+              <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="block">
                 <button className="w-full text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-md py-2.5 shadow-sm transition-all">
                   Download PDF Document
                 </button>

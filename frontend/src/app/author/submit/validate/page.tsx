@@ -97,6 +97,9 @@ export default function SubmissionValidationPage() {
       }
 
       const formData = new FormData();
+      if (formDataState.journalId) {
+        formData.append("journalId", formDataState.journalId);
+      }
       formData.append("section", formDataState.section);
       formData.append("language", formDataState.language);
       formData.append("authors", JSON.stringify(formDataState.authors));

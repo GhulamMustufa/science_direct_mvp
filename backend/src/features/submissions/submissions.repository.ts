@@ -17,6 +17,7 @@ export class SubmissionsRepository {
       // 1. Create Article (Draft/Submitted status)
       const [newArticle] = await tx.insert(articles).values({
         submitterId,
+        journalId,
         title,
         abstract,
         status: 'SUBMITTED',

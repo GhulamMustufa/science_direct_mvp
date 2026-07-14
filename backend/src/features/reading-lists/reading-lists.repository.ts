@@ -100,7 +100,7 @@ export class ReadingListsRepository {
     const result = await db
       .select({ id: articles.id })
       .from(articles)
-      .where(and(eq(articles.id, articleId), isNull(articles.deletedAt)))
+      .where(and(eq(articles.id, articleId), eq(articles.status, 'PUBLISHED'), isNull(articles.deletedAt)))
       .limit(1);
 
     return result[0] || null;
@@ -183,7 +183,7 @@ export class ReadingListsRepository {
       .leftJoin(volumes, eq(articles.volumeId, volumes.id))
       .leftJoin(journals, eq(volumes.journalId, journals.id))
       .leftJoin(issues, eq(articles.issueId, issues.id))
-      .where(and(eq(readingListArticles.readingListId, readingListId), isNull(articles.deletedAt)))
+      .where(and(eq(readingListArticles.readingListId, readingListId), eq(articles.status, 'PUBLISHED'), isNull(articles.deletedAt)))
       .orderBy(desc(articles.publishedAt));
 
     return this.attachAuthorsToArticles(list);

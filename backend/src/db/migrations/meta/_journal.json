@@ -57,6 +57,13 @@
       "when": 1784020978103,
       "tag": "0007_hesitant_retro_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1784048954449,
+      "tag": "0008_greedy_spirit",
+      "breakpoints": true
     }
   ]
 }

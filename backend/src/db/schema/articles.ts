@@ -2,6 +2,7 @@ import { pgTable, uuid, varchar, timestamp, customType, index, integer, pgEnum }
 import { sql } from 'drizzle-orm';
 import { issues } from './issues';
 import { volumes } from './volumes';
+import { journals } from './journals';
 import { users } from './users';
 
 export const articleStatusEnum = pgEnum('article_status', [
@@ -23,6 +24,7 @@ const tsvector = customType<{ data: string }>({
 export const articles = pgTable('articles', {
   id: uuid('id').primaryKey().defaultRandom(),
   submitterId: uuid('submitter_id').references(() => users.id, { onDelete: 'set null' }),
+  journalId: uuid('journal_id').references(() => journals.id, { onDelete: 'set null' }),
   issueId: uuid('issue_id').references(() => issues.id, { onDelete: 'set null' }),
   volumeId: uuid('volume_id').references(() => volumes.id, { onDelete: 'set null' }),
   title: varchar('title', { length: 500 }).notNull(),

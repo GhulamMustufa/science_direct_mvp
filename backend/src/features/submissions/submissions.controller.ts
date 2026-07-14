@@ -78,13 +78,63 @@ export const uploadRevision = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    // Need to fetch existing article for validation payload
+    const { submissionsRepository } = await import('./submissions.repository.js');
+    const existingArticle = await submissionsRepository.getSubmissionById(articleId);
+    if (!existingArticle) {
+      return res.status(404).json({ error: 'Article not found' });
+    }
+
+    let parsedDocument;
+    if (req.file) {
+      try {
+        const fs = await import('fs/promises');
+        const buffer = await fs.readFile(req.file.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+      } catch (err) {
+        console.error('Document parsing error:', err);
+      }
+    }
+
+    // We pass dummy data for fields that aren't being updated in the revision 
+    // to pass the Metadata and Author validators, as we only care about the new PDF structure.
     const payload = {
-      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined
+      title: existingArticle.title,
+      abstract: existingArticle.abstract,
+      section: "Research Article", 
+      language: "en",
+      authors: [{ firstName: 'Author', lastName: 'Name', email: 'author@test.com' }],
+      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      parsedDocument
     };
 
-    const validationResult = validationService.validateRevision(payload);
-    if (!validationResult.isValid) {
-      return res.status(400).json({ error: 'Validation error', details: validationResult.errors });
+    const report = validationService.validateSubmissionReport(payload);
+    
+    let hasStructuralOrFileErrors = false;
+    let errorMsg = 'Your revised PDF failed automated validation:\n';
+    const categoriesToCheck = ['File', 'Structure'];
+    
+    for (const cat of categoriesToCheck) {
+      if (report.categories[cat] && report.categories[cat].issues) {
+        const catErrors = report.categories[cat].issues.filter((i: any) => i.severity === 'error');
+        if (catErrors.length > 0) {
+          hasStructuralOrFileErrors = true;
+          catErrors.forEach((i: any) => {
+            errorMsg += `- ${i.message} (${i.field})\n`;
+          });
+        }
+      }
+    }
+
+    if (hasStructuralOrFileErrors) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: errorMsg,
+          code: 'VALIDATION_FAILED',
+          details: [report]
+        }
+      });
     }
 
     const updatedArticle = await submissionsService.uploadRevision(submitterId, articleId, req.file!);
@@ -132,6 +182,43 @@ export const validateArticle = async (req: Request, res: Response) => {
     res.json({ success: true, data: report });
   } catch (error) {
     console.error('Error validating article:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const validateRevision = async (req: Request, res: Response) => {
+  try {
+    const submitterId = req.user?.id;
+    if (!submitterId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    let parsedDocument;
+    if (req.file) {
+      try {
+        const fs = await import('fs/promises');
+        const buffer = await fs.readFile(req.file.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+      } catch (err) {
+        console.error('Document parsing error:', err);
+      }
+    }
+
+    const payload = {
+      title: "Dummy",
+      abstract: "Dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy dummy",
+      section: "Research Article", 
+      language: "en",
+      authors: [{ firstName: 'Author', lastName: 'Name', email: 'author@test.com', affiliation: 'Test', isCorresponding: true }],
+      keywords: ["test1", "test2", "test3"],
+      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      parsedDocument
+    };
+
+    const report = validationService.validateSubmissionReport(payload);
+    res.json({ success: true, data: report });
+  } catch (error) {
+    console.error('Error validating revision:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

@@ -37,10 +37,10 @@ export default function AdminOverviewPage() {
           actionText="Manage Users"
         />
         <PanelCard
-          title="OJS Synchronization"
-          desc="Trigger a manual import of journals, volumes, issues, and articles from the OJS REST API database."
-          href="/admin/sync"
-          actionText="Sync Control"
+          title="Editorial Submissions"
+          desc="Review, accept, reject, or request revisions for author manuscript submissions."
+          href="/admin/submissions"
+          actionText="Manage Submissions"
         />
       </div>
     </div>

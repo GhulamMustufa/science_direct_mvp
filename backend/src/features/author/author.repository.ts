@@ -29,7 +29,7 @@ export class AuthorRepository {
   /**
    * Find publications (articles) associated with an author, including co-authors.
    */
-  async findPublicationsByAuthorId(authorId: string, userId: string): Promise<any[]> {
+  async findPublicationsByAuthorId(authorId: string | null, userId: string): Promise<any[]> {
     const list = await db
       .select({
         id: articles.id,
@@ -54,10 +54,9 @@ export class AuthorRepository {
         and(
           eq(articles.status, 'PUBLISHED'),
           isNull(articles.deletedAt),
-          or(
-            eq(articleAuthors.authorId, authorId),
-            eq(articles.submitterId, userId)
-          )
+          authorId 
+            ? or(eq(articleAuthors.authorId, authorId), eq(articles.submitterId, userId))
+            : eq(articles.submitterId, userId)
         )
       )
       .orderBy(desc(articles.publishedAt));
