@@ -42,9 +42,13 @@ export default async function JournalDetailPage({
 
       <div>
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
-          Table of Contents
+          Volumes and Issues
         </h2>
-        <IssueList volumes={volumes} issues={issues} journalId={id} />
+        {volumes.length === 0 ? (
+          <p className="text-sm text-zinc-500">No volumes have been published for this journal yet.</p>
+        ) : (
+          <IssueList volumes={volumes} issues={issues} journalId={id} />
+        )}
       </div>
     </div>
   );

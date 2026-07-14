@@ -31,7 +31,6 @@ export function Navbar() {
       {user ? (
         <>
           <Link href="/bookmarks" className={linkClass("/bookmarks")}>Bookmarks</Link>
-          <Link href="/reading-lists" className={linkClass("/reading-lists")}>Reading Lists</Link>
           {["author", "editor", "admin"].includes(user.role) && (
             <Link href="/author" className={linkClass("/author")}>Dashboard</Link>
           )}

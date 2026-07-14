@@ -3,7 +3,6 @@ import { articles } from './articles';
 import { authors } from './authors';
 import { categories } from './categories';
 import { keywords } from './keywords';
-import { readingLists } from './reading-lists';
 
 export const articleAuthors = pgTable('article_authors', {
   articleId: uuid('article_id').references(() => articles.id, { onDelete: 'cascade' }).notNull(),
@@ -27,9 +26,4 @@ export const articleKeywords = pgTable('article_keywords', {
   pk: primaryKey({ columns: [t.articleId, t.keywordId] }),
 }));
 
-export const readingListArticles = pgTable('reading_list_articles', {
-  readingListId: uuid('reading_list_id').references(() => readingLists.id, { onDelete: 'cascade' }).notNull(),
-  articleId: uuid('article_id').references(() => articles.id, { onDelete: 'cascade' }).notNull(),
-}, (t) => ({
-  pk: primaryKey({ columns: [t.readingListId, t.articleId] }),
-}));
+

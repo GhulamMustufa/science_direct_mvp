@@ -7,7 +7,7 @@ export * from './articles';
 export * from './categories';
 export * from './keywords';
 export * from './bookmarks';
-export * from './reading-lists';
+
 export * from './notifications';
 export * from './junctions';
 export * from './article-files';

@@ -6,7 +6,7 @@ import journalsRouter from './features/journals/journals.routes.js';
 import articlesRouter from './features/articles/articles.routes.js';
 import taxonomyRouter from './features/taxonomy/taxonomy.routes.js';
 import bookmarksRouter from './features/bookmarks/bookmarks.routes.js';
-import readingListsRouter from './features/reading-lists/reading-lists.routes.js';
+
 import notificationsRouter from './features/notifications/notifications.routes.js';
 import profileRouter from './features/profile/profile.routes.js';
 import authorRouter from './features/author/author.routes.js';
@@ -46,7 +46,7 @@ app.use('/api', journalsRouter);
 app.use('/api', articlesRouter);
 app.use('/api', taxonomyRouter);
 app.use('/api', bookmarksRouter);
-app.use('/api', readingListsRouter);
+
 app.use('/api', notificationsRouter);
 app.use('/api', profileRouter);
 app.use('/api', authorRouter);

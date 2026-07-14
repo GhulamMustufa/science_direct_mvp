@@ -1,15 +1,6 @@
 import { apiFetch, apiFetchWithMeta } from "@/lib/api";
 import { User, Journal } from "@/types";
 
-export interface SyncJobResponse {
-  id: string;
-  status: "pending" | "running" | "completed" | "failed";
-  startedAt: string;
-  completedAt?: string;
-  error?: string;
-  progress?: string;
-}
-
 import { SubmissionResponse } from "@/features/author/services/author.service";
 
 export const adminService = {
