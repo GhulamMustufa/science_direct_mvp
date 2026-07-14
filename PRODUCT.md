@@ -31,19 +31,15 @@ Research publishing and discovery platform inspired by ScienceDirect.
 
 ## Publishing
 
-OJS handles:
+Our platform handles the end-to-end publishing workflow:
 
-- Submission
-- Review
-- Acceptance
-- Publication
-
-Our platform handles:
-
-- Discovery
-- Search
-- Profiles
-- Analytics
+- Author Submission (PDF manuscripts)
+- Desk Review by Admin/Editor
+- Revision cycles (if requested)
+- Acceptance & Publication
+- Tagging to Volumes
+- Discovery & Search
+- Profiles & Analytics
 
 ## Out of Scope
 

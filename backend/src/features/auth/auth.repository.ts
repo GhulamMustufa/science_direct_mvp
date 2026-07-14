@@ -4,6 +4,7 @@ import { users } from '../../db/schema/index.js';
 
 export interface CreateUserInput {
   email: string;
+  passwordHash?: string;
   firstName?: string;
   lastName?: string;
   role?: 'reader' | 'author' | 'admin';
@@ -58,6 +59,7 @@ export class AuthRepository {
       .insert(users)
       .values({
         email: data.email.toLowerCase().trim(),
+        passwordHash: data.passwordHash || null,
         firstName: data.firstName || null,
         lastName: data.lastName || null,
         role: data.role || 'reader',

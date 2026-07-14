@@ -30,15 +30,16 @@ async function makeAdmin() {
     if (existing) {
       await db
         .update(schema.users)
-        .set({ role: 'admin' })
+        .set({ role: 'admin', passwordHash })
         .where(eq(schema.users.email, ADMIN_EMAIL));
-      console.log(`✅ Existing user "${ADMIN_EMAIL}" promoted to admin.`);
+      console.log(`✅ Existing user "${ADMIN_EMAIL}" promoted to admin and password updated.`);
     } else {
       await db.insert(schema.users).values({
         firstName: 'Admin',
         lastName: 'User',
         email: ADMIN_EMAIL,
         role: 'admin',
+        passwordHash,
       });
       console.log(`✅ New admin user created: ${ADMIN_EMAIL}`);
     }

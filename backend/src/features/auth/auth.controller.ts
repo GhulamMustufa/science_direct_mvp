@@ -27,6 +27,25 @@ export class AuthController {
   };
 
   /**
+   * Handle user registration.
+   */
+  register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { registerSchema } = await import('./auth.schema.js');
+      const input = registerSchema.parse(req.body);
+      const user = await this.authService.register(input);
+      // User is created but not logged in automatically (no tokens generated/cookies set)
+
+      res.status(201).json({
+        success: true,
+        data: { user },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * Handle user logout.
    */
   logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

@@ -11,7 +11,8 @@ import notificationsRouter from './features/notifications/notifications.routes.j
 import profileRouter from './features/profile/profile.routes.js';
 import authorRouter from './features/author/author.routes.js';
 import adminRouter from './features/admin/admin.routes.js';
-import syncRouter from './features/sync/sync.routes.js';
+import submissionsRouter from './features/submissions/submissions.routes.js';
+import editorialRouter from './features/editorial/editorial.routes.js';
 import { errorHandler } from './middleware/error.js';
 
 
@@ -50,14 +51,18 @@ app.use('/api', notificationsRouter);
 app.use('/api', profileRouter);
 app.use('/api', authorRouter);
 app.use('/api', adminRouter);
-app.use('/api', syncRouter);
+app.use('/api', submissionsRouter);
+app.use('/api', editorialRouter);
 
 
 
 
 
+
+import path from 'path';
 
 // Global error handler (must be registered after all other routes and middlewares)
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use(errorHandler);
 
 export default app;

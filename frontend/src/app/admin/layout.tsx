@@ -27,7 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const links = [
     { href: "/admin", label: "Overview" },
     { href: "/admin/users", label: "User Management" },
-    { href: "/admin/sync", label: "OJS Sync Control" },
+    { href: "/admin/submissions", label: "Editorial Submissions" },
   ];
 
   return (

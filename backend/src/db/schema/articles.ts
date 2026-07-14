@@ -1,6 +1,17 @@
-import { pgTable, uuid, varchar, timestamp, customType, index, integer } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, timestamp, customType, index, integer, pgEnum } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { issues } from './issues';
+import { volumes } from './volumes';
+import { users } from './users';
+
+export const articleStatusEnum = pgEnum('article_status', [
+  'DRAFT',
+  'SUBMITTED',
+  'REVISIONS_REQUIRED',
+  'ACCEPTED',
+  'REJECTED',
+  'PUBLISHED'
+]);
 
 // Custom type for PostgreSQL tsvector
 const tsvector = customType<{ data: string }>({
@@ -11,15 +22,16 @@ const tsvector = customType<{ data: string }>({
 
 export const articles = pgTable('articles', {
   id: uuid('id').primaryKey().defaultRandom(),
-  issueId: uuid('issue_id')
-    .references(() => issues.id, { onDelete: 'cascade' })
-    .notNull(),
-  ojsArticleId: varchar('ojs_article_id', { length: 255 }).unique(),
+  submitterId: uuid('submitter_id').references(() => users.id, { onDelete: 'set null' }),
+  issueId: uuid('issue_id').references(() => issues.id, { onDelete: 'set null' }),
+  volumeId: uuid('volume_id').references(() => volumes.id, { onDelete: 'set null' }),
   title: varchar('title', { length: 500 }).notNull(),
   abstract: varchar('abstract', { length: 4000 }).notNull(),
+  additionalAuthors: varchar('additional_authors', { length: 1000 }),
+  status: articleStatusEnum('status').default('DRAFT').notNull(),
   pdfUrl: varchar('pdf_url', { length: 2048 }),
   doi: varchar('doi', { length: 255 }).unique(),
-  publishedAt: timestamp('published_at').notNull(),
+  publishedAt: timestamp('published_at'),
   searchVector: tsvector('search_vector'),
   views: integer('views').default(0).notNull(),
   downloads: integer('downloads').default(0).notNull(),

@@ -1,0 +1,1 @@
+ALTER TABLE "articles" ADD COLUMN "additional_authors" varchar(1000);

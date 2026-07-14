@@ -10,6 +10,8 @@ export interface SyncJobResponse {
   progress?: string;
 }
 
+import { SubmissionResponse } from "@/features/author/services/author.service";
+
 export const adminService = {
   async getUsers(page = 1, limit = 10): Promise<{ users: User[]; total: number }> {
     const offset = (page - 1) * limit;
@@ -28,13 +30,22 @@ export const adminService = {
     return res;
   },
 
-  async triggerSync(): Promise<{ jobId: string; status: string }> {
-    return apiFetch<{ jobId: string; status: string }>("/admin/sync/trigger", {
+  async getSubmissions(status?: string): Promise<SubmissionResponse[]> {
+    const query = status ? `?status=${status}` : '';
+    return apiFetch<SubmissionResponse[]>(`/editorial/submissions${query}`);
+  },
+
+  async makeDecision(articleId: string, decision: 'ACCEPTED' | 'REJECTED' | 'REVISIONS_REQUIRED'): Promise<SubmissionResponse> {
+    return apiFetch<SubmissionResponse>(`/editorial/submissions/${articleId}/decision`, {
       method: "POST",
+      body: JSON.stringify({ decision }),
     });
   },
 
-  async getSyncStatus(jobId: string): Promise<SyncJobResponse> {
-    return apiFetch<SyncJobResponse>(`/admin/sync/status/${jobId}`);
+  async publishArticle(articleId: string, volumeId: string): Promise<SubmissionResponse> {
+    return apiFetch<SubmissionResponse>(`/editorial/submissions/${articleId}/publish`, {
+      method: "POST",
+      body: JSON.stringify({ volumeId }),
+    });
   },
 };

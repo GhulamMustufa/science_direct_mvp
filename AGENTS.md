@@ -34,14 +34,13 @@ Search:
 - PostgreSQL Full Text Search
 
 Publishing:
-- OJS (external system)
+- Internal platform (End-to-End)
 
 ## Architecture Rules
 
 - Frontend and backend are separate projects.
 - Never move backend into Next.js API routes.
-- OJS must remain an external system.
-- Do not rebuild peer review workflow.
+- Internal Submission and Editorial Workflow.
 - PostgreSQL is source of truth.
 - Use feature-based architecture.
 - Use repository + service pattern.

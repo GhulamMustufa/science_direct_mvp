@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import { AuthRepository, DbUser } from './auth.repository.js';
 import { LoginInput } from './auth.schema.js';
 import { AppError } from '../../middleware/error.js';
-import { OjsClient } from '../sync/ojs.client.js';
 
 export interface UserResponse {
   id: string;
@@ -17,35 +16,46 @@ export interface UserResponse {
 
 export class AuthService {
   constructor(
-    private authRepository: AuthRepository,
-    private ojsClient: OjsClient
+    private authRepository: AuthRepository
   ) {}
 
   /**
-   * Authenticate user credentials against OJS API directly.
+   * Authenticate user credentials locally.
    */
   async login(data: LoginInput): Promise<UserResponse> {
-    // 1. Authenticate with OJS Master Identity Provider
-    const ojsUser = await this.ojsClient.authenticateUser(data.email, data.password);
+    const localUser = await this.authRepository.findByEmail(data.email);
     
-    if (!ojsUser) {
+    if (!localUser || !localUser.passwordHash) {
       throw new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
-    // 2. Ensure the user exists in our local database mirror
-    let localUser = await this.authRepository.findByEmail(data.email);
-    
-    if (!localUser) {
-      // First time logging in from OJS, create a shadow profile
-      localUser = await this.authRepository.createUser({
-        email: data.email,
-        firstName: ojsUser.firstName,
-        lastName: ojsUser.lastName,
-        role: ojsUser.role || 'author', // Default to author if missing
-      });
+    const isPasswordValid = await bcrypt.compare(data.password, localUser.passwordHash);
+    if (!isPasswordValid) {
+      throw new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
     return this.sanitizeUser(localUser);
+  }
+
+  /**
+   * Register a new user locally.
+   */
+  async register(data: import('./auth.schema.js').RegisterInput): Promise<UserResponse> {
+    const existingUser = await this.authRepository.findByEmail(data.email);
+    if (existingUser) {
+      throw new AppError(409, 'User with this email already exists', 'USER_EXISTS');
+    }
+
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    const newUser = await this.authRepository.createUser({
+      email: data.email,
+      passwordHash,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: 'author', // Defaulting to author
+    });
+
+    return this.sanitizeUser(newUser);
   }
 
   /**

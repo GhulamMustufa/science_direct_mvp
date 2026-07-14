@@ -62,44 +62,38 @@ function SubmissionsTable({ submissions }: { submissions: SubmissionResponse[] }
   if (submissions.length === 0) {
     return (
       <div className="text-center py-12 border border-dashed border-zinc-200 rounded-xl dark:border-zinc-800 text-zinc-500 bg-white dark:bg-zinc-900/20">
-        No active submissions. Submit manuscripts through OJS.
+        No active submissions. <Link href="/author/submit" className="text-blue-600 hover:underline">Submit a new manuscript.</Link>
       </div>
     );
   }
 
-  const getStatusBadge = (status: SubmissionResponse["status"]) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case "submitted":
+      case "SUBMITTED":
         return (
           <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-250 dark:border-zinc-700">
             Submitted
           </span>
         );
-      case "under_review":
+      case "REVISIONS_REQUIRED":
         return (
-          <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-750 dark:bg-blue-950/20 dark:text-blue-400 border border-blue-200 dark:border-blue-900 animate-pulse">
-            Under Review
-          </span>
-        );
-      case "revisions_required":
-        return (
-          <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-950/25 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
+          <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-950/25 dark:text-amber-400 border border-amber-200 dark:border-amber-900 animate-pulse">
             Revisions Required
           </span>
         );
-      case "accepted":
+      case "ACCEPTED":
         return (
           <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-750 dark:bg-green-950/20 dark:text-green-400 border border-green-200 dark:border-green-900">
             Accepted
           </span>
         );
-      case "rejected":
+      case "REJECTED":
         return (
           <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-950/20 dark:text-red-400 border border-red-200 dark:border-red-900">
             Rejected
           </span>
         );
-      case "published":
+      case "PUBLISHED":
         return (
           <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
             Published
@@ -120,7 +114,6 @@ function SubmissionsTable({ submissions }: { submissions: SubmissionResponse[] }
         <thead>
           <tr className="border-b border-zinc-150 bg-zinc-50/70 text-xs font-semibold text-zinc-500 uppercase tracking-wider dark:border-zinc-800 dark:bg-zinc-900/30">
             <th className="px-6 py-4">Title</th>
-            <th className="px-6 py-4">Journal</th>
             <th className="px-6 py-4 text-center">Status</th>
             <th className="px-6 py-4 text-center">Submitted Date</th>
             <th className="px-6 py-4 text-right">Actions</th>
@@ -128,7 +121,7 @@ function SubmissionsTable({ submissions }: { submissions: SubmissionResponse[] }
         </thead>
         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {submissions.map((sub) => {
-            const dateStr = new Date(sub.submittedAt).toLocaleDateString("en-US", {
+            const dateStr = new Date(sub.createdAt || sub.submittedAt).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
@@ -138,22 +131,15 @@ function SubmissionsTable({ submissions }: { submissions: SubmissionResponse[] }
                 <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-100 max-w-sm truncate">
                   {sub.title}
                 </td>
-                <td className="px-6 py-4 text-zinc-650 dark:text-zinc-350">{sub.journalTitle || "-"}</td>
                 <td className="px-6 py-4 text-center">{getStatusBadge(sub.status)}</td>
                 <td className="px-6 py-4 text-center font-medium text-zinc-600 dark:text-zinc-400">{dateStr}</td>
                 <td className="px-6 py-4 text-right">
-                  {sub.ojsUrl ? (
-                    <a
-                      href={sub.ojsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-bold text-blue-650 hover:underline dark:text-blue-400"
-                    >
-                      View in OJS
-                    </a>
-                  ) : (
-                    <span className="text-xs text-zinc-400 dark:text-zinc-600 font-medium">-</span>
-                  )}
+                  <Link
+                    href={`/author/submissions/${sub.id}`}
+                    className="text-xs font-bold text-blue-650 hover:underline dark:text-blue-400"
+                  >
+                    View Details
+                  </Link>
                 </td>
               </tr>
             );

@@ -15,20 +15,18 @@ graph TD
         API[Express API Gateway & Routing]
         AuthSvc[Auth Service]
         SearchSvc[Search Service]
-        SyncSvc[OJS Sync Service]
+        SubmissionSvc[Submission Service]
+        EditorialSvc[Editorial Service]
         
         API --> AuthSvc
         API --> SearchSvc
-        API --> SyncSvc
+        API --> SubmissionSvc
+        API --> EditorialSvc
     end
 
     subgraph Storage ["Storage & Database Tier"]
         DB[(PostgreSQL - Supabase)]
         Firebase[(Firebase Storage)]
-    end
-
-    subgraph External ["External Services"]
-        OJS[Open Journal Systems - OJS]
     end
 
     %% Client flows
@@ -38,11 +36,11 @@ graph TD
     %% Backend database flows
     AuthSvc --> DB
     SearchSvc --> DB
-    SyncSvc --> DB
+    SubmissionSvc --> DB
+    EditorialSvc --> DB
     
-    %% OJS sync flows
-    SyncSvc -->|Pull Metadata & PDFs| OJS
-    SyncSvc -->|Upload PDFs| Firebase
+    %% Upload flows
+    SubmissionSvc -->|Upload PDFs| Firebase
 ```
 
 ## Core Principles
@@ -50,14 +48,15 @@ graph TD
 - **Monolithic Backend:** Express.js + TypeScript, simple to scale vertically and deploy.
 - **Separate Frontend & Backend:** Next.js App Router for frontend UI, communicating with the monolithic Express backend via API.
 - **Repository + Service Pattern:** Clean separation of concerns with Controllers, Services, and Repositories.
-- **OJS as Authority:** OJS remains the source of truth for editorial workflows. The platform pulls published content and acts as a read-heavy discovery layer.
+- **Internal Publishing Workflow:** The platform handles end-to-end publishing, from author submission to admin approval and publication.
 
 ## System Boundaries and Interfaces
 
 ### 1. Monolithic Backend (Express.js)
 The backend is organized using a feature-based structure (`src/features/...`).
 - **Auth Service:** Issues and validates JWT access and refresh tokens. Authenticated sessions are stored in HTTP-only cookies.
-- **OJS Sync Service:** Scheduled cron processes pull new publications from OJS REST APIs, downloading PDFs and storing them in Firebase Storage, then caching metadata in PostgreSQL.
+- **Submission Service:** Handles authors uploading PDF manuscripts and submitting articles for review.
+- **Editorial Service:** Handles admins reviewing submissions, requesting revisions, and publishing articles to volumes.
 - **Search Service:** Implements PostgreSQL Full-Text Search (FTS) using weighted fields (title, abstract, keywords) and a GIN index.
 
 ### 2. Frontend Application (Next.js)
@@ -66,10 +65,10 @@ The backend is organized using a feature-based structure (`src/features/...`).
 - **Authentication:** Sessions are propagated via cookie headers forwarded from Next.js server actions / SSR fetches to the Express backend.
 
 ### 3. Database (Supabase PostgreSQL)
-- **Source of Truth:** PostgreSQL holds all indexed articles, journals, issues, users, bookmarks, and sync logs.
+- **Source of Truth:** PostgreSQL holds all indexed articles, journals, volumes, users, bookmarks, and submission statuses.
 - **Soft Deletes:** Standard `deleted_at` timestamps on all tables.
 - **UUID Keys:** Standard UUIDs (`gen_random_uuid()`) for primary keys.
 
 ### 4. Storage (Firebase Storage)
-- PDF galleys downloaded from OJS are stored in Firebase Storage.
+- PDF galleys uploaded by authors are stored in Firebase Storage.
 - Signed URLs or public read-only paths are supplied to the frontend PDF reader.

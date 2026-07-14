@@ -10,5 +10,4 @@ export * from './bookmarks';
 export * from './reading-lists';
 export * from './notifications';
 export * from './junctions';
-export * from './submissions';
-
+export * from './article-files';
