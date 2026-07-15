@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -10,10 +10,14 @@ export function SearchBar() {
   const query = searchParams.get("query") || "";
   const [inputValue, setInputValue] = useState(query);
   const debouncedValue = useDebounce(inputValue, 300);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setInputValue(query);
+    // Only update the input value from the URL if the user isn't currently typing in it.
+    // This prevents flickering/overwriting when router.push is slow.
+    if (document.activeElement !== inputRef.current) {
+      setInputValue(query);
+    }
   }, [query]);
 
   useEffect(() => {
@@ -32,6 +36,7 @@ export function SearchBar() {
   return (
     <div className="relative w-full">
       <input
+        ref={inputRef}
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}

@@ -92,6 +92,17 @@ export function SearchFilters() {
         </select>
       </div>
 
+      {(selectedJournal || selectedVolume || selectedCategory || searchParams.get("q")) && (
+        <div className="pt-2">
+          <button
+            onClick={() => router.push("/search")}
+            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 transition"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      )}
+
     </div>
   );
 }
