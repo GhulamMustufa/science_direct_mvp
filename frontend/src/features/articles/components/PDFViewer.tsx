@@ -19,7 +19,7 @@ export function PDFViewer({ articleId, pdfUrl }: PDFViewerProps) {
         <span>Interactive Frame</span>
       </div>
       <iframe
-        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/articles/${articleId}/pdf`}
+        src={pdfUrl.startsWith('http') ? pdfUrl : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:4000'}${pdfUrl}`}
         title="PDF Reader"
         className="h-[650px] w-full rounded-lg border border-zinc-100 dark:border-zinc-800"
       />
