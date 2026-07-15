@@ -108,14 +108,29 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Document Guidelines</h2>
         </div>
         <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8">
-          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Formatting Rules</h3>
-          <ul className="space-y-3 text-zinc-600 dark:text-zinc-400 mb-8 list-disc list-inside">
-            <li>Manuscripts must be submitted exclusively in <strong className="text-zinc-800 dark:text-zinc-200">PDF format</strong> via the online submission portal.</li>
-            <li>Use standard fonts (e.g., Times New Roman, Arial) at 12-point size with double spacing throughout the text.</li>
-            <li>The title page should include the article title, author names, affiliations, and contact information of the corresponding author.</li>
-            <li>Abstracts must not exceed 250 words and should be followed by 3-5 relevant keywords.</li>
-            <li>All figures and tables should be embedded within the text near their first citation.</li>
-          </ul>
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Automated Validation Rules</h3>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+            Our platform uses automated checks to ensure all submissions meet baseline academic standards before peer review.
+          </p>
+          <div className="space-y-4 mb-8">
+            <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-lg text-red-800 dark:text-red-200">
+              <h4 className="font-bold flex items-center gap-2 mb-2"><ShieldCheck size={18} /> Blocking Errors (Upload Rejected)</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li><strong>File Type:</strong> Must be a PDF or Word Document (.docx, .doc).</li>
+                <li><strong>File Size:</strong> Cannot exceed 10MB.</li>
+                <li><strong>Word Count:</strong> Must be between 100 and 10,000 words.</li>
+                <li><strong>Figures:</strong> Cannot contain more than 15 figures.</li>
+                <li><strong>Required Sections:</strong> Must contain Introduction, Methods/Methodology, Results, Discussion, and Conclusions.</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 rounded-lg text-amber-800 dark:text-amber-200">
+              <h4 className="font-bold flex items-center gap-2 mb-2"><FileCheck size={18} /> Warnings (Flagged for Editor)</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li><strong>Short Document:</strong> Word count under 1,000 words.</li>
+                <li><strong>Missing Figures:</strong> Zero figures detected in the document.</li>
+              </ul>
+            </div>
+          </div>
 
           <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Ethical Standards</h3>
           <ul className="space-y-3 text-zinc-600 dark:text-zinc-400 list-disc list-inside">
