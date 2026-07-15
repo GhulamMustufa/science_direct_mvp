@@ -28,7 +28,22 @@ const corsOrigins = [
 ];
 
 app.use(cors({
-  origin: corsOrigins,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost and any vercel preview deployment
+    if (origin.startsWith('http://localhost') || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // Allow the configured frontend URL
+    if (corsOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    callback(null, false);
+  },
   credentials: true,
 }));
 app.use(express.json());

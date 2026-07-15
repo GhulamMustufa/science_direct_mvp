@@ -49,7 +49,7 @@ function ProfileCard({ name, affiliation, image }: { name: string, affiliation: 
     <div className="flex flex-col items-center text-center p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
       <div className="h-24 w-24 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 text-zinc-400 dark:text-zinc-500 overflow-hidden relative">
         {image ? (
-          <Image src={image} alt={name} fill className="object-cover" />
+          <Image src={image} alt={name} fill className="object-cover" unoptimized />
         ) : (
           <User size={32} />
         )}
