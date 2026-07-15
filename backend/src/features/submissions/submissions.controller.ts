@@ -13,12 +13,15 @@ export const submitArticle = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const pdfFile = files?.['pdf']?.[0];
+    const coverImageFile = files?.['coverImage']?.[0];
     let parsedDocument;
-    if (req.file) {
+    if (pdfFile) {
       try {
         const fs = await import('fs/promises');
-        const buffer = await fs.readFile(req.file.path);
-        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+        const buffer = await fs.readFile(pdfFile.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, pdfFile.mimetype, pdfFile.originalname);
       } catch (err) {
         console.error('Document parsing error:', err);
       }
@@ -31,7 +34,7 @@ export const submitArticle = async (req: Request, res: Response) => {
       language: req.body.language,
       authors: req.body.authors ? JSON.parse(req.body.authors) : undefined,
       keywords: req.body.keywords ? JSON.parse(req.body.keywords) : undefined,
-      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      file: pdfFile ? { mimetype: pdfFile.mimetype, size: pdfFile.size } : undefined,
       parsedDocument
     };
 
@@ -46,7 +49,7 @@ export const submitArticle = async (req: Request, res: Response) => {
       abstract: req.body.abstract || parsedDocument?.abstract,
     };
 
-    const article = await submissionsService.submitArticle(submitterId, mergedData, req.file!);
+    const article = await submissionsService.submitArticle(submitterId, mergedData, pdfFile!, coverImageFile);
     res.status(201).json({ success: true, data: article });
   } catch (error) {
     console.error('Error submitting article:', error);
@@ -85,12 +88,15 @@ export const uploadRevision = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Article not found' });
     }
 
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const pdfFile = files?.['pdf']?.[0];
+    const coverImageFile = files?.['coverImage']?.[0];
     let parsedDocument;
-    if (req.file) {
+    if (pdfFile) {
       try {
         const fs = await import('fs/promises');
-        const buffer = await fs.readFile(req.file.path);
-        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+        const buffer = await fs.readFile(pdfFile.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, pdfFile.mimetype, pdfFile.originalname);
       } catch (err) {
         console.error('Document parsing error:', err);
       }
@@ -104,7 +110,7 @@ export const uploadRevision = async (req: Request, res: Response) => {
       section: "Research Article", 
       language: "en",
       authors: [{ firstName: 'Author', lastName: 'Name', email: 'author@test.com', affiliation: 'Test', isCorresponding: true }],
-      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      file: pdfFile ? { mimetype: pdfFile.mimetype, size: pdfFile.size } : undefined,
       parsedDocument
     };
 
@@ -137,7 +143,7 @@ export const uploadRevision = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedArticle = await submissionsService.uploadRevision(submitterId, articleId, req.file!);
+    const updatedArticle = await submissionsService.uploadRevision(submitterId, articleId, pdfFile!);
     res.json({ success: true, data: updatedArticle });
   } catch (error: any) {
     if (error.message === 'Unauthorized') return res.status(403).json({ error: error.message });
@@ -156,12 +162,15 @@ export const validateArticle = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const pdfFile = files?.['pdf']?.[0];
+    const coverImageFile = files?.['coverImage']?.[0];
     let parsedDocument;
-    if (req.file) {
+    if (pdfFile) {
       try {
         const fs = await import('fs/promises');
-        const buffer = await fs.readFile(req.file.path);
-        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+        const buffer = await fs.readFile(pdfFile.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, pdfFile.mimetype, pdfFile.originalname);
       } catch (err) {
         console.error('Document parsing error:', err);
       }
@@ -174,7 +183,7 @@ export const validateArticle = async (req: Request, res: Response) => {
       language: req.body.language,
       authors: req.body.authors ? JSON.parse(req.body.authors) : undefined,
       keywords: req.body.keywords ? JSON.parse(req.body.keywords) : undefined,
-      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      file: pdfFile ? { mimetype: pdfFile.mimetype, size: pdfFile.size } : undefined,
       parsedDocument
     };
 
@@ -193,12 +202,15 @@ export const validateRevision = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const pdfFile = files?.['pdf']?.[0];
+    const coverImageFile = files?.['coverImage']?.[0];
     let parsedDocument;
-    if (req.file) {
+    if (pdfFile) {
       try {
         const fs = await import('fs/promises');
-        const buffer = await fs.readFile(req.file.path);
-        parsedDocument = await documentParserService.parseDocument(buffer, req.file.mimetype, req.file.originalname);
+        const buffer = await fs.readFile(pdfFile.path);
+        parsedDocument = await documentParserService.parseDocument(buffer, pdfFile.mimetype, pdfFile.originalname);
       } catch (err) {
         console.error('Document parsing error:', err);
       }
@@ -211,7 +223,7 @@ export const validateRevision = async (req: Request, res: Response) => {
       language: "en",
       authors: [{ firstName: 'Author', lastName: 'Name', email: 'author@test.com', affiliation: 'Test', isCorresponding: true }],
       keywords: ["test1", "test2", "test3"],
-      file: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : undefined,
+      file: pdfFile ? { mimetype: pdfFile.mimetype, size: pdfFile.size } : undefined,
       parsedDocument
     };
 

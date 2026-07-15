@@ -66,7 +66,7 @@ export default function SubmissionValidationPage() {
     return <FormPageSkeleton />;
   }
 
-  const getFileFromIndexedDB = async (): Promise<File | null> => {
+  const getFileFromIndexedDB = async (key: string): Promise<File | null> => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open('SubmissionDB', 1);
       request.onupgradeneeded = () => {
@@ -79,7 +79,7 @@ export default function SubmissionValidationPage() {
         const db = request.result;
         const tx = db.transaction('files', 'readonly');
         const store = tx.objectStore('files');
-        const getReq = store.get('draftFile');
+        const getReq = store.get(key);
         getReq.onsuccess = () => resolve(getReq.result || null);
         getReq.onerror = () => reject(getReq.error);
       };
@@ -92,10 +92,11 @@ export default function SubmissionValidationPage() {
     setIsSubmitting(true);
 
     try {
-      const file = await getFileFromIndexedDB();
+      const file = await getFileFromIndexedDB('draftFile');
       if (!file) {
         throw new Error("Manuscript file not found in local cache. Please re-upload.");
       }
+      const coverImageFile = await getFileFromIndexedDB('coverImageFile');
 
       const formData = new FormData();
       if (formDataState.journalId) {
@@ -105,6 +106,9 @@ export default function SubmissionValidationPage() {
       formData.append("language", formDataState.language);
       formData.append("authors", JSON.stringify(formDataState.authors));
       formData.append("pdf", file);
+      if (coverImageFile) {
+        formData.append("coverImage", coverImageFile);
+      }
 
       await authorService.submitArticle(formData);
 
@@ -119,6 +123,7 @@ export default function SubmissionValidationPage() {
         const db = request.result;
         const tx = db.transaction('files', 'readwrite');
         tx.objectStore('files').delete('draftFile');
+        tx.objectStore('files').delete('coverImageFile');
       };
 
       router.push("/author");

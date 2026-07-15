@@ -64,6 +64,13 @@
       "when": 1784048954449,
       "tag": "0008_greedy_spirit",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1784071791411,
+      "tag": "0009_bumpy_living_mummy",
+      "breakpoints": true
     }
   ]
 }

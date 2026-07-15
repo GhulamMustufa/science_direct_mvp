@@ -11,7 +11,8 @@ export class SubmissionsRepository {
     authorIds: string[],
     pdfUrl: string,
     originalName: string,
-    additionalAuthors?: string
+    additionalAuthors?: string,
+    coverImageUrl?: string
   ) {
     return await db.transaction(async (tx) => {
       // 1. Create Article (Draft/Submitted status)
@@ -23,6 +24,7 @@ export class SubmissionsRepository {
         status: 'SUBMITTED',
         pdfUrl: pdfUrl, // Initial PDF URL
         additionalAuthors,
+        coverImageUrl,
       }).returning();
 
       // 2. Link Authors

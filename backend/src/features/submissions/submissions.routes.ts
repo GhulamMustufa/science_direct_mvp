@@ -25,20 +25,28 @@ const upload = multer({
     const allowedMimeTypes = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/msword'
+      'application/msword',
+      'image/jpeg',
+      'image/png',
+      'image/webp'
     ];
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF and Word Document (.docx, .doc) files are allowed'));
+      cb(new Error('Invalid file type uploaded'));
     }
   }
 });
 
-router.post('/submissions', authenticate, upload.single('pdf'), submitArticle);
-router.post('/submissions/validate', authenticate, upload.single('pdf'), validateArticle);
+const uploadFields = upload.fields([
+  { name: 'pdf', maxCount: 1 },
+  { name: 'coverImage', maxCount: 1 }
+]);
+
+router.post('/submissions', authenticate, uploadFields, submitArticle);
+router.post('/submissions/validate', authenticate, uploadFields, validateArticle);
 router.get('/submissions', authenticate, getMySubmissions);
-router.post('/submissions/:id/revisions', authenticate, upload.single('pdf'), uploadRevision);
-router.post('/submissions/:id/revisions/validate', authenticate, upload.single('pdf'), validateRevision);
+router.post('/submissions/:id/revisions', authenticate, uploadFields, uploadRevision);
+router.post('/submissions/:id/revisions/validate', authenticate, uploadFields, validateRevision);
 
 export default router;

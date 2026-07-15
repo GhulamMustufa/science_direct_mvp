@@ -43,17 +43,17 @@ export const adminService = {
     });
   },
 
-  async createJournal(data: { title: string; description?: string; issn?: string }): Promise<Journal> {
+  async createJournal(data: FormData): Promise<Journal> {
     return apiFetch<Journal>("/journals", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     });
   },
 
-  async updateJournal(id: string, data: { title?: string; description?: string; issn?: string }): Promise<Journal> {
+  async updateJournal(id: string, data: FormData): Promise<Journal> {
     return apiFetch<Journal>(`/journals/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data,
     });
   },
 };

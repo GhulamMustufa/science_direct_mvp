@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JournalsService } from './journals.service.js';
+import cloudinary from '../storage/cloudinary.js';
+import fs from 'fs';
 
 /**
  * Helper to safely extract and sanitize limit and offset pagination parameters.
@@ -122,7 +124,20 @@ export class JournalsController {
   createJournal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { title, description, issn, ojsJournalId } = req.body;
-      const data = await this.journalsService.createJournal({ title, description, issn, ojsJournalId });
+      
+      let coverImageUrl: string | undefined = undefined;
+      if (req.file) {
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+          resource_type: 'image',
+          folder: 'journal_covers',
+        });
+        coverImageUrl = uploadResult.secure_url;
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (err) {}
+      }
+
+      const data = await this.journalsService.createJournal({ title, description, issn, ojsJournalId, coverImageUrl });
 
       res.status(201).json({
         success: true,
@@ -140,7 +155,20 @@ export class JournalsController {
     try {
       const { id } = req.params;
       const { title, description, issn } = req.body;
-      const data = await this.journalsService.updateJournal(id, { title, description, issn });
+      
+      let coverImageUrl: string | undefined = undefined;
+      if (req.file) {
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+          resource_type: 'image',
+          folder: 'journal_covers',
+        });
+        coverImageUrl = uploadResult.secure_url;
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (err) {}
+      }
+
+      const data = await this.journalsService.updateJournal(id, { title, description, issn, coverImageUrl });
 
       res.status(200).json({
         success: true,

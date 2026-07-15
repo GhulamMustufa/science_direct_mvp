@@ -33,6 +33,7 @@ export class BookmarksRepository {
           title: articles.title,
           abstract: articles.abstract,
           pdfUrl: articles.pdfUrl,
+          coverImageUrl: articles.coverImageUrl,
           doi: articles.doi,
           publishedAt: articles.publishedAt,
           views: articles.views,
@@ -40,6 +41,7 @@ export class BookmarksRepository {
           issueNumber: issues.issueNumber,
           volumeNumber: volumes.volumeNumber,
           journalTitle: journals.title,
+          journalCoverImageUrl: journals.coverImageUrl,
           journalId: journals.id,
         },
       })

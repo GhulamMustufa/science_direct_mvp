@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Article } from "@/types";
+import { FileText } from "lucide-react";
 
 export function ArticleCard({ article }: { article: Article }) {
   const publishedDate = new Date(article.publishedAt).toLocaleDateString("en-US", {
@@ -16,9 +18,26 @@ export function ArticleCard({ article }: { article: Article }) {
     .map((a) => `${a.details.firstName} ${a.details.lastName}`)
     .join(", ");
 
+  const displayImageUrl = article.coverImageUrl || article.journalCoverImageUrl;
+
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
+    <div className="group flex flex-col sm:flex-row overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-md transition-shadow">
+      {displayImageUrl ? (
+        <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
+          <Image 
+            src={displayImageUrl as string} 
+            alt={article.title} 
+            fill
+            className="object-cover"
+          />
+        </div>
+      ) : (
+        <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+          <FileText className="w-12 h-12 text-zinc-300 dark:text-zinc-600" />
+        </div>
+      )}
+      <div className="flex flex-col flex-grow p-6">
+        <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
         {article.journalTitle && (
           <span className="font-semibold text-emerald-600 dark:text-emerald-400">
             {article.journalTitle}
@@ -64,6 +83,7 @@ export function ArticleCard({ article }: { article: Article }) {
         >
           View Full Text →
         </Link>
+      </div>
       </div>
     </div>
   );

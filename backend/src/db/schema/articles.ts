@@ -32,6 +32,7 @@ export const articles = pgTable('articles', {
   additionalAuthors: varchar('additional_authors', { length: 1000 }),
   status: articleStatusEnum('status').default('DRAFT').notNull(),
   pdfUrl: varchar('pdf_url', { length: 2048 }),
+  coverImageUrl: varchar('cover_image_url', { length: 1000 }),
   doi: varchar('doi', { length: 255 }).unique(),
   publishedAt: timestamp('published_at'),
   searchVector: tsvector('search_vector'),

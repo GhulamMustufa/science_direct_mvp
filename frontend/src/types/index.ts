@@ -24,6 +24,7 @@ export interface Journal {
   title: string;
   description: string | null;
   issn: string | null;
+  coverImageUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +50,7 @@ export interface Article {
   title: string;
   abstract: string;
   pdfUrl: string | null;
+  coverImageUrl?: string | null;
   doi: string | null;
   publishedAt: string;
   views: number;
@@ -58,6 +60,7 @@ export interface Article {
     details: Author;
   }[];
   journalTitle?: string;
+  journalCoverImageUrl?: string | null;
   journalId?: string;
   volumeNumber?: string;
   issueNumber?: string;

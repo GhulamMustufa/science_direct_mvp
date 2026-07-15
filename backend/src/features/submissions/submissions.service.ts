@@ -1,13 +1,37 @@
 import { submissionsRepository } from './submissions.repository.js';
 import path from 'path';
 import fs from 'fs';
+import cloudinary from '../storage/cloudinary.js';
 
 export class SubmissionsService {
-  async submitArticle(submitterId: string, data: any, file: Express.Multer.File) {
-    // Generate a permanent URL/path for the file
-    // In a real app with Firebase, we would upload to Firebase Storage here.
-    // For MVP local storage, we just use the path where Multer saved it.
-    const fileUrl = `/uploads/${file.filename}`;
+  async submitArticle(submitterId: string, data: any, file: Express.Multer.File, coverImageFile?: Express.Multer.File) {
+    // Upload file to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'raw', // Use raw for PDFs/docs
+      folder: 'manuscripts',
+    });
+    const fileUrl = uploadResult.secure_url;
+
+    let coverImageUrl: string | undefined = undefined;
+    if (coverImageFile) {
+      const coverUploadResult = await cloudinary.uploader.upload(coverImageFile.path, {
+        resource_type: 'image',
+        folder: 'article_covers',
+      });
+      coverImageUrl = coverUploadResult.secure_url;
+      try {
+        fs.unlinkSync(coverImageFile.path);
+      } catch (err) {
+        console.error(`Failed to delete temporary cover file ${coverImageFile.path}:`, err);
+      }
+    }
+
+    // Delete the local file after successful upload
+    try {
+      fs.unlinkSync(file.path);
+    } catch (err) {
+      console.error(`Failed to delete temporary file ${file.path}:`, err);
+    }
     
     // Parse authorIds (assuming they might come as a JSON array string)
     let authorIds: string[] = [];
@@ -31,7 +55,8 @@ export class SubmissionsService {
       authorIds,
       fileUrl,
       file.originalname,
-      data.additionalAuthors
+      data.additionalAuthors,
+      coverImageUrl
     );
   }
 
@@ -51,7 +76,19 @@ export class SubmissionsService {
       throw new Error('Revisions are not currently required for this article');
     }
 
-    const fileUrl = `/uploads/${file.filename}`;
+    // Upload file to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'raw',
+      folder: 'revisions',
+    });
+    const fileUrl = uploadResult.secure_url;
+
+    // Delete the local file after successful upload
+    try {
+      fs.unlinkSync(file.path);
+    } catch (err) {
+      console.error(`Failed to delete temporary file ${file.path}:`, err);
+    }
     return await submissionsRepository.addRevision(articleId, fileUrl, file.originalname);
   }
 }

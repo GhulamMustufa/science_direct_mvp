@@ -77,7 +77,7 @@ export class JournalsService {
   /**
    * Create a new journal
    */
-  async createJournal(data: { title: string; description?: string; issn?: string; ojsJournalId?: string }): Promise<DbJournal> {
+  async createJournal(data: { title: string; description?: string; issn?: string; ojsJournalId?: string; coverImageUrl?: string }): Promise<DbJournal> {
     if (!data.title) {
       throw new AppError(400, 'Journal title is required', 'VALIDATION_ERROR');
     }
@@ -88,7 +88,7 @@ export class JournalsService {
   /**
    * Update an existing journal
    */
-  async updateJournal(id: string, data: { title?: string; description?: string; issn?: string }): Promise<DbJournal> {
+  async updateJournal(id: string, data: { title?: string; description?: string; issn?: string; coverImageUrl?: string }): Promise<DbJournal> {
     const journal = await this.journalsRepository.findJournalById(id);
     if (!journal) {
       throw new AppError(404, 'Journal not found', 'JOURNAL_NOT_FOUND');
