@@ -40,7 +40,7 @@ export class ArticlesRepository {
     }
 
     if (options.journalId) {
-      conditions.push(eq(volumes.journalId, options.journalId));
+      conditions.push(eq(articles.journalId, options.journalId));
     }
 
     if (options.volumeId) {
@@ -73,7 +73,7 @@ export class ArticlesRepository {
       .select(selectFields)
       .from(articles)
       .leftJoin(volumes, eq(articles.volumeId, volumes.id))
-      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(journals, eq(articles.journalId, journals.id))
       .leftJoin(issues, eq(articles.issueId, issues.id))
       .where(whereAnd);
 
@@ -100,7 +100,7 @@ export class ArticlesRepository {
       .select({ count: sql<number>`count(distinct ${articles.id})` })
       .from(articles)
       .leftJoin(volumes, eq(articles.volumeId, volumes.id))
-      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(journals, eq(articles.journalId, journals.id))
       .leftJoin(issues, eq(articles.issueId, issues.id))
       .where(whereClause);
 
@@ -195,7 +195,7 @@ export class ArticlesRepository {
       })
       .from(articles)
       .leftJoin(volumes, eq(articles.volumeId, volumes.id))
-      .leftJoin(journals, eq(volumes.journalId, journals.id))
+      .leftJoin(journals, eq(articles.journalId, journals.id))
       .leftJoin(issues, eq(articles.issueId, issues.id))
       .where(and(eq(articles.id, id), eq(articles.status, 'PUBLISHED'), isNull(articles.deletedAt)))
       .limit(1);
