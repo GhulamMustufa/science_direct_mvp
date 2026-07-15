@@ -20,9 +20,14 @@ export function SearchBar() {
     }
   }, [query]);
 
+  const queryRef = useRef(query);
   useEffect(() => {
+    queryRef.current = query;
+  }, [query]);
+
+  useEffect(() => {
+    if (debouncedValue === queryRef.current) return;
     const params = new URLSearchParams(window.location.search);
-    if (debouncedValue === query) return;
 
     if (debouncedValue) {
       params.set("query", debouncedValue);
@@ -31,7 +36,7 @@ export function SearchBar() {
     }
     params.set("page", "1"); // Reset pagination on new search
     router.push(`/search?${params.toString()}`);
-  }, [debouncedValue, query, router]);
+  }, [debouncedValue, router]);
 
   return (
     <div className="relative w-full">

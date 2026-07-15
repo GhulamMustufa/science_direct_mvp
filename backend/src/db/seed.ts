@@ -79,6 +79,13 @@ async function main() {
       issn: '8765-4321',
     }).returning();
 
+    console.log('Inserting Categories...');
+    await db.insert(schema.categories).values([
+      { name: 'Computer Science' },
+      { name: 'Physics' },
+      { name: 'Mathematics' },
+    ]);
+
     console.log('Inserting Submissions (Draft/Submitted)...');
     await db.insert(schema.articles).values({
       submitterId: authorUser.id,

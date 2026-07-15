@@ -115,4 +115,45 @@ export class AdminRepository {
 
     return result[0];
   }
+
+  /**
+   * Update a user's basic info.
+   */
+  async updateUser(
+    id: string,
+    data: { firstName?: string; lastName?: string; role?: 'reader' | 'author' | 'admin' }
+  ): Promise<Omit<DbUser, 'passwordHash'>> {
+    const result = await db
+      .update(users)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning({
+        id: users.id,
+        email: users.email,
+        role: users.role,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        deletedAt: users.deletedAt,
+      });
+
+    return result[0];
+  }
+
+  /**
+   * Soft delete (block) a user.
+   */
+  async blockUser(id: string): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id));
+  }
 }

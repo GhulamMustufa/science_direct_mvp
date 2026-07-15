@@ -36,6 +36,26 @@ export function useAdmin(limit = 10) {
     }
   };
 
+  const updateUser = async (userId: string, data: { firstName?: string; lastName?: string; role?: string }) => {
+    try {
+      const updatedUser = await adminService.updateUser(userId, data);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, ...updatedUser } : u))
+      );
+    } catch (err: unknown) {
+      throw new Error((err as Error).message || "Failed to update user.");
+    }
+  };
+
+  const blockUser = async (userId: string) => {
+    try {
+      await adminService.blockUser(userId);
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
+    } catch (err: unknown) {
+      throw new Error((err as Error).message || "Failed to block user.");
+    }
+  };
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchUsers();
@@ -49,6 +69,8 @@ export function useAdmin(limit = 10) {
     usersPage,
     setUsersPage,
     changeUserRole,
+    updateUser,
+    blockUser,
     refreshUsers: fetchUsers,
   };
 }

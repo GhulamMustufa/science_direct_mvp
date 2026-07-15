@@ -71,4 +71,50 @@ export class AdminController {
       next(error);
     }
   };
+
+  /**
+   * Update a user's basic info.
+   */
+  updateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new AppError(401, 'Authentication required', 'UNAUTHORIZED');
+      }
+
+      const { id } = userIdParamSchema.parse(req.params);
+      const { updateUserSchema } = await import('./admin.schema.js');
+      const data = updateUserSchema.parse(req.body);
+
+      const updated = await this.adminService.updateUser(id, data);
+
+      res.status(200).json({
+        success: true,
+        data: updated,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Block (soft-delete) a user.
+   */
+  blockUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new AppError(401, 'Authentication required', 'UNAUTHORIZED');
+      }
+
+      const { id } = userIdParamSchema.parse(req.params);
+
+      await this.adminService.blockUser(id);
+
+      res.status(200).json({
+        success: true,
+        message: 'User blocked successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

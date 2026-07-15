@@ -25,4 +25,18 @@ router.put(
   adminController.changeUserRole
 );
 
+router.put(
+  '/admin/users/:id',
+  authenticate,
+  authorize(['admin']),
+  adminController.updateUser
+);
+
+router.delete(
+  '/admin/users/:id',
+  authenticate,
+  authorize(['admin']),
+  adminController.blockUser
+);
+
 export default router;

@@ -12,3 +12,11 @@ export const userIdParamSchema = z.object({
 
 export type ChangeRoleInput = z.infer<typeof changeRoleSchema>;
 export type UserIdParam = z.infer<typeof userIdParamSchema>;
+
+export const updateUserSchema = z.object({
+  firstName: z.string().min(1, "First name must not be empty").optional(),
+  lastName: z.string().min(1, "Last name must not be empty").optional(),
+  role: z.enum(['reader', 'author', 'admin']).optional(),
+});
+
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;

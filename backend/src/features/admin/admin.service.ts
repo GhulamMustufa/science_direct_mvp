@@ -42,4 +42,45 @@ export class AdminService {
 
     return updatedUser;
   }
+
+  /**
+   * Update user details.
+   */
+  async updateUser(
+    id: string,
+    data: { firstName?: string; lastName?: string; role?: 'reader' | 'author' | 'admin' }
+  ): Promise<Omit<DbUser, 'passwordHash'>> {
+    const user = await this.adminRepository.findUserById(id);
+    if (!user) {
+      throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
+    }
+
+    const updatedUser = await this.adminRepository.updateUser(id, data);
+
+    if (data.role === 'author') {
+      const author = await this.adminRepository.findAuthorByUserId(id);
+      if (!author) {
+        await this.adminRepository.createAuthor({
+          userId: id,
+          firstName: updatedUser.firstName || 'Author',
+          lastName: updatedUser.lastName || 'Profile',
+          email: updatedUser.email,
+        });
+      }
+    }
+
+    return updatedUser;
+  }
+
+  /**
+   * Soft delete (block) a user.
+   */
+  async blockUser(id: string): Promise<void> {
+    const user = await this.adminRepository.findUserById(id);
+    if (!user) {
+      throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
+    }
+
+    await this.adminRepository.blockUser(id);
+  }
 }

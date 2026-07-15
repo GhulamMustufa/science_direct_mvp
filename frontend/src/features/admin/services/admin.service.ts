@@ -21,6 +21,20 @@ export const adminService = {
     return res;
   },
 
+  async updateUser(userId: string, data: { firstName?: string; lastName?: string; role?: string }): Promise<User> {
+    const res = await apiFetch<User>(`/admin/users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    return res;
+  },
+
+  async blockUser(userId: string): Promise<void> {
+    await apiFetch(`/admin/users/${userId}`, {
+      method: "DELETE",
+    });
+  },
+
   async getSubmissions(status?: string): Promise<SubmissionResponse[]> {
     const query = status ? `?status=${status}` : '';
     return apiFetch<SubmissionResponse[]>(`/editorial/submissions${query}`);

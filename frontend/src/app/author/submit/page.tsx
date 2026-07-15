@@ -391,8 +391,9 @@ export default function SubmitArticlePage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">First Name</label>
+                    <label htmlFor={`firstName-${index}`} className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">First Name</label>
                     <input
+                      id={`firstName-${index}`}
                       type="text"
                       value={author.firstName}
                       onChange={(e) => updateAuthor(index, 'firstName', e.target.value)}
@@ -400,8 +401,9 @@ export default function SubmitArticlePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Last Name</label>
+                    <label htmlFor={`lastName-${index}`} className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Last Name</label>
                     <input
+                      id={`lastName-${index}`}
                       type="text"
                       value={author.lastName}
                       onChange={(e) => updateAuthor(index, 'lastName', e.target.value)}
@@ -409,8 +411,9 @@ export default function SubmitArticlePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Email</label>
+                    <label htmlFor={`email-${index}`} className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Email</label>
                     <input
+                      id={`email-${index}`}
                       type="email"
                       value={author.email}
                       onChange={(e) => updateAuthor(index, 'email', e.target.value)}
@@ -418,8 +421,9 @@ export default function SubmitArticlePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Affiliation</label>
+                    <label htmlFor={`affiliation-${index}`} className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Affiliation</label>
                     <input
+                      id={`affiliation-${index}`}
                       type="text"
                       value={author.affiliation}
                       onChange={(e) => updateAuthor(index, 'affiliation', e.target.value)}
