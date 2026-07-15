@@ -1,116 +1,129 @@
-import { User, ShieldCheck, GraduationCap } from "lucide-react";
-import Image from "next/image";
-
-const editorialBoard = [
-  { name: "Prof. Syed A Aziz", affiliation: "Faculty of Medicine, Department of Pathology and Lab Medicine, University of Ottawa, Canada.", image: "/images/editorial/syed_a_aziz.jpeg" },
-  { name: "Prof. Bilquees Gul", affiliation: "Ex Director, Dr Ajmal Khan Institute of Sustainable Halophytes Utilization, University of Karachi", image: "/images/editorial/bilquees_gul.jpeg" },
-  { name: "Prof. Maqsood Ansari", affiliation: "Department of Genetics, University of Karachi", image: "/images/editorial/maqsood_ansari.jpeg" },
-  { name: "Prof. Hamida Nusrat", affiliation: "PhD, PHM, SM(ASCP), MLS(ASCPi), TS(ABB), Professor, UC Berkeley, California USA.", image: "/images/editorial/hamida_nusrat.jpeg" },
-  { name: "Prof. Urszula Guzik", affiliation: "Department of Biochemistry, Faculty of Biology and Environmental Protection, University of Silesia, Katowice. Poland", image: "/images/editorial/urszula_guzik.jpg" },
-  { name: "Dr. Raffat Sultana", affiliation: "Executive Director, Karachi Institute of Heart Diseases", image: "/images/editorial/raffat_sultana.png" },
-  { name: "Prof. Zamin Shaheed Siddiqui", affiliation: "MAHQ Biological Research Centre, University of Karachi, Pakistan", image: "/images/editorial/zamin_shaheed_siddiqui.jpeg" },
-  { name: "Prof. Tabassum Mahboob", affiliation: "Meritorious Professor of Biochemistry, former Dean Faculty of Science, University of Karachi", image: "/images/editorial/tabassum_mahboob.jpeg" },
-  { name: "Prof. S. M. Shahid", affiliation: "School of Health Science Eastern Institute of Technology, Auckland University, New Zealand", image: "/images/editorial/s_m_shahid.jpeg" },
-  { name: "Prof. Farah Jabeen", affiliation: "Department of Biochemistry, Jinnah Women University for Women, Karachi, Pakistan", image: "/images/editorial/farah_jabeen.jpeg" },
-  { name: "Prof. Shamim A Qureshi", affiliation: "Department of Biochemistry, University of Karachi, Pakistan.", image: "/images/editorial/shamim_a_qureshi.jpeg" },
-  { name: "Prof. Afsheen Aman", affiliation: "The Karachi institute of Biotechnology and Genetic Engineering (KIBGE). University of Karachi, Pakistan.", image: "/images/editorial/afsheen_aman.png" },
-  { name: "Prof. Junaid Mahmood Alam", affiliation: "Head of clinical biochemistry and chemical Pathology lab services, Liaquat National Hospital and medical college, Karachi", image: "/images/editorial/junaid_mahmood_alam.jpeg" },
-  { name: "Prof. Qudsia Tariq", affiliation: "Department of Psychology, University of Karachi, Pakistan.", image: "/images/editorial/qudsia_tariq.jpeg" },
-  { name: "Prof. Zaheer Ul Haq", affiliation: "Dr. Panjwani Center for Molecular Medicine & Drug Research (ICCBS). University of Karachi, Pakistan.", image: "/images/editorial/zaheer_ul_haq.jpeg" },
-  { name: "Prof. Aliya Riaz", affiliation: "Department of Biochemistry, Jinnah University for Women, Karachi, Pakistan", image: "/images/editorial/aliya_riaz.jpeg" },
-  { name: "Dr. Muhammad Asif Nawaz", affiliation: "Department of Biotechnology, Shaheed Benazir Bhutto University, KPK, Pakistan.", image: "/images/editorial/muhammad_asif_nawaz.jpeg" }
-];
-
-const advisoryBoard = [
-  { name: "Dr. Muhammad Mohtasheemul Hasan", affiliation: "University of Karachi, Karachi, Pakistan" },
-  { name: "Dr. S. M. Shahid", affiliation: "School of Health Science Eastern Institute of Technology, Auckland University, New Zealand" },
-  { name: "Dr. Hamida Nusrat", affiliation: "Professor, UC Berkeley, California USA" },
-  { name: "Dr. Maqsood Ali Ansari", affiliation: "Department of Genetics, University of Karachi" },
-  { name: "Dr. Ileana Cornelia Farcasanu", affiliation: "Bucharest University, Bucharest, Romania" },
-  { name: "Dr. Urszula Guzik", affiliation: "Faculty of Biology and Environmental Protection, University of Silesia, Katowice. Poland" },
-  { name: "Dr. Afsheen Aman", affiliation: "KIBGE, University of Karachi, Pakistan" },
-  { name: "Dr. Zaheer Ul-Haq", affiliation: "ICCBS, University of Karachi" },
-  { name: "Dr. Basit Ansari", affiliation: "Department of Health, Physical Education and Sports Sciences, University of Karachi" },
-  { name: "Dr. Raheela Rahmat Zohra", affiliation: "Department of Biotechnology, University of Karachi, Pakistan" },
-  { name: "Dr. Sidra Pervez", affiliation: "Shaheed Benazir Bhutto Women University (SBBWU), Peshawar, Pakistan" },
-  { name: "Dr. Farhat Batool", affiliation: "Department of Biochemistry, University of Karachi" },
-  { name: "Dr. Aiman Umer", affiliation: "Shaheed Benazir Bhutto Women University (SBBWU), Peshawar, Pakistan" },
-  { name: "Dr. Saba Memon", affiliation: "Pakistan Institute of Rehabilitation and Medical Sciences, Karachi, Pakistan" },
-  { name: "Dr. Sadia Saleem", affiliation: "Department of Biochemistry, University of Karachi, Pakistan" },
-  { name: "Dr. Junaid Mahmood Alam", affiliation: "Department of Clinical Biochemistry LNH and Medical College, Karachi-Pakistan" },
-  { name: "Dr. Samina Khan", affiliation: "Jinnah University for Women, Karachi, Pakistan" },
-  { name: "Dr. Syeda Ariba Shoaib", affiliation: "Pakistan Institute of Rehabilitation and Medical Sciences, Karachi, Pakistan" },
-  { name: "Dr. Nimra Baig", affiliation: "Bhitai Institute of Management Science & Technology, Mirpurkhas, Sindh, Pakistan" },
-  { name: "Mr. Mohsin Khan", affiliation: "Ohio University Athens, USA" }
-];
-
-function ProfileCard({ name, affiliation, image }: { name: string, affiliation: string, image?: string }) {
-  return (
-    <div className="flex flex-col items-center text-center p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="h-24 w-24 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 text-zinc-400 dark:text-zinc-500 overflow-hidden relative">
-        {image ? (
-          <Image src={image} alt={name} fill className="object-cover" unoptimized />
-        ) : (
-          <User size={32} />
-        )}
-      </div>
-      <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">{name}</h3>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{affiliation}</p>
-    </div>
-  );
-}
+import { BookOpen, FileCheck, Users, Upload, CheckCircle2, ShieldCheck, PenTool } from "lucide-react";
 
 export default function AboutPage() {
   return (
-    <div className="flex flex-col flex-1 pb-24">
+    <div className="flex flex-col flex-1 pb-24 bg-white dark:bg-zinc-950">
       {/* Header */}
       <section className="bg-emerald-900 text-emerald-50 py-20 px-4 text-center">
         <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">About Us</h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">About Us & How We Work</h1>
           <p className="text-lg text-emerald-200 max-w-2xl mx-auto">
-            Meet the distinguished experts and academics leading the International Journal of Biochemical and Allied Health Research.
+            Discover our editorial process, author guidelines, and the journey of a manuscript from submission to publication.
           </p>
         </div>
       </section>
 
-      {/* Editor in Chief */}
-      <section className="container mx-auto max-w-7xl px-4 mt-16">
-        <div className="flex items-center gap-3 mb-8">
-          <ShieldCheck className="text-emerald-600" size={32} />
-          <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Editor-In-Chief</h2>
+      {/* How We Work */}
+      <section className="container mx-auto max-w-4xl px-4 mt-16">
+        <div className="flex items-center gap-3 mb-6">
+          <BookOpen className="text-emerald-600" size={32} />
+          <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">How We Work</h2>
         </div>
-        <div className="max-w-md">
-          <ProfileCard 
-            name="Prof. Shah Ali Ul Qader" 
-            affiliation="University of Karachi, Pakistan" 
-            image="/images/editorial/shah_ali_ul_qader.jpeg"
-          />
-        </div>
-      </section>
-
-      {/* Editorial Board */}
-      <section className="container mx-auto max-w-7xl px-4 mt-20">
-        <div className="flex items-center gap-3 mb-8">
-          <GraduationCap className="text-emerald-600" size={32} />
-          <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Editorial Board</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {editorialBoard.map((member, index) => (
-            <ProfileCard key={index} name={member.name} affiliation={member.affiliation} image={member.image} />
-          ))}
+        <div className="prose prose-zinc dark:prose-invert max-w-none text-zinc-600 dark:text-zinc-300">
+          <p className="text-lg leading-relaxed mb-4">
+            At the International Journal of Biochemical and Allied Health Research (IJBAHR), our core mission is to foster academic excellence by providing a rigorous, transparent, and swift peer-review process. We believe that groundbreaking research deserves a platform that respects the hard work of scientists, clinicians, and researchers worldwide. 
+          </p>
+          <p className="text-lg leading-relaxed mb-6">
+            Our editorial framework is built upon the principles of academic integrity and collaborative growth. Once a manuscript is submitted to our platform, it undergoes a meticulous evaluation by our Editor-in-Chief, followed by double-blind peer review conducted by esteemed members of our Editorial and Advisory Boards. This ensures that every piece of published research meets the highest standards of scientific validity and relevance.
+          </p>
         </div>
       </section>
 
-      {/* Advisory Board */}
-      <section className="container mx-auto max-w-7xl px-4 mt-20">
+      {/* The User Journey / Flow */}
+      <section className="container mx-auto max-w-4xl px-4 mt-16">
         <div className="flex items-center gap-3 mb-8">
-          <GraduationCap className="text-emerald-600" size={32} />
-          <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Advisory Board</h2>
+          <Users className="text-emerald-600" size={32} />
+          <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">The Author Journey</h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {advisoryBoard.map((member, index) => (
-            <ProfileCard key={index} name={member.name} affiliation={member.affiliation} />
-          ))}
+        
+        <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-zinc-300 dark:before:via-zinc-700 before:to-transparent">
+          
+          {/* Step 1 */}
+          <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+              <Upload size={18} />
+            </div>
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">1. Initial Submission</h3>
+              </div>
+              <p className="text-zinc-600 dark:text-zinc-400">
+                Authors create an account and submit their manuscript along with the required metadata. The initial screening ensures the document adheres to formatting guidelines and falls within the journal's scope.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+              <ShieldCheck size={18} />
+            </div>
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">2. Peer Review</h3>
+              </div>
+              <p className="text-zinc-600 dark:text-zinc-400">
+                The manuscript is assigned to domain experts for a double-blind peer review. Reviewers assess the methodology, originality, and significance of the research, providing constructive feedback.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+              <PenTool size={18} />
+            </div>
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">3. Revisions & Decision</h3>
+              </div>
+              <p className="text-zinc-600 dark:text-zinc-400">
+                Based on reviewer feedback, the Editor makes a decision (Accept, Minor/Major Revisions, or Reject). Authors are given the opportunity to address concerns and upload revised documents.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+              <CheckCircle2 size={18} />
+            </div>
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 shadow-sm">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="font-bold text-emerald-900 dark:text-emerald-100 text-lg">4. Publication</h3>
+              </div>
+              <p className="text-emerald-800/80 dark:text-emerald-300">
+                Upon final acceptance, the manuscript is formatted and published in the upcoming journal volume. It becomes immediately accessible to the global scientific community.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Submission Guidelines */}
+      <section className="container mx-auto max-w-4xl px-4 mt-20">
+        <div className="flex items-center gap-3 mb-6">
+          <FileCheck className="text-emerald-600" size={32} />
+          <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Document Guidelines</h2>
+        </div>
+        <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8">
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Formatting Rules</h3>
+          <ul className="space-y-3 text-zinc-600 dark:text-zinc-400 mb-8 list-disc list-inside">
+            <li>Manuscripts must be submitted exclusively in <strong className="text-zinc-800 dark:text-zinc-200">PDF format</strong> via the online submission portal.</li>
+            <li>Use standard fonts (e.g., Times New Roman, Arial) at 12-point size with double spacing throughout the text.</li>
+            <li>The title page should include the article title, author names, affiliations, and contact information of the corresponding author.</li>
+            <li>Abstracts must not exceed 250 words and should be followed by 3-5 relevant keywords.</li>
+            <li>All figures and tables should be embedded within the text near their first citation.</li>
+          </ul>
+
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Ethical Standards</h3>
+          <ul className="space-y-3 text-zinc-600 dark:text-zinc-400 list-disc list-inside">
+            <li>Plagiarism in any form is strictly prohibited. All submissions are screened for similarity.</li>
+            <li>Authors must declare any potential conflicts of interest at the time of submission.</li>
+            <li>Research involving human or animal subjects must include a statement of ethical approval from the relevant institutional committee.</li>
+            <li>Only original work that has not been published or is under consideration elsewhere will be accepted.</li>
+          </ul>
         </div>
       </section>
     </div>

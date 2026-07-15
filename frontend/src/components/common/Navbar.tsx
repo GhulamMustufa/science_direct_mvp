@@ -26,6 +26,7 @@ export function Navbar() {
     <nav className="flex items-center gap-6">
       <Link href="/" className={linkClass("/")}>Home</Link>
       <Link href="/about" className={linkClass("/about")}>About Us</Link>
+      <Link href="/members" className={linkClass("/members")}>Members</Link>
       <Link href="/journals" className={linkClass("/journals")}>Journals</Link>
       <Link href="/search" className={linkClass("/search")}>Search</Link>
 
