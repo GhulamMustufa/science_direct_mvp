@@ -10,19 +10,23 @@ export function SearchFilters() {
   const searchParams = useSearchParams();
   const [journals, setJournals] = useState<Journal[]>([]);
   const [volumes, setVolumes] = useState<Volume[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
 
   const selectedJournal = searchParams.get("journalId") || "";
   const selectedVolume = searchParams.get("volumeId") || "";
+  const selectedCategory = searchParams.get("categoryId") || "";
 
   useEffect(() => {
     async function loadFilters() {
       try {
-        const [journalsData, volumesData] = await Promise.all([
+        const [journalsData, volumesData, categoriesData] = await Promise.all([
           searchService.getJournals(),
           searchService.getVolumes(),
+          searchService.getCategories(),
         ]);
         setJournals(journalsData);
         setVolumes(volumesData);
+        setCategories(categoriesData);
       } catch (err) {
         console.error("Failed to load search filter options", err);
       }
@@ -72,6 +76,22 @@ export function SearchFilters() {
           ))}
         </select>
       </div>
+
+
+      <div>
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Filter by Category</h3>
+        <select
+          value={selectedCategory}
+          onChange={(e) => updateParam("categoryId", e.target.value)}
+          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+      </div>
+
     </div>
   );
 }

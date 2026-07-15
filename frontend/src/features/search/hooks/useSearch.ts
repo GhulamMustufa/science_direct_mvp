@@ -15,6 +15,7 @@ export function useSearch(limit = 10) {
   const query = searchParams.get("query") || "";
   const journalId = searchParams.get("journalId") || "";
   const volumeId = searchParams.get("volumeId") || "";
+  const categoryId = searchParams.get("categoryId") || "";
   const keyword = searchParams.get("keyword") || "";
   const page = parseInt(searchParams.get("page") || "1", 10);
 
@@ -27,6 +28,7 @@ export function useSearch(limit = 10) {
         query,
         journalId,
         volumeId,
+        categoryId,
         keyword,
         limit,
         offset,
@@ -38,7 +40,7 @@ export function useSearch(limit = 10) {
     } finally {
       setLoading(false);
     }
-  }, [query, journalId, volumeId, keyword, page, limit]);
+  }, [query, journalId, volumeId, categoryId, keyword, page, limit]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -53,6 +55,7 @@ export function useSearch(limit = 10) {
     query,
     journalId,
     volumeId,
+    categoryId,
     keyword,
     page,
     limit,

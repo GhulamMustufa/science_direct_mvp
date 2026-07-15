@@ -12,7 +12,8 @@ export class SubmissionsRepository {
     pdfUrl: string,
     originalName: string,
     additionalAuthors?: string,
-    coverImageUrl?: string
+    coverImageUrl?: string,
+    categoryIds?: string[]
   ) {
     return await db.transaction(async (tx) => {
       // 1. Create Article (Draft/Submitted status)
@@ -45,6 +46,18 @@ export class SubmissionsRepository {
         fileUrl: pdfUrl,
         originalName: originalName,
       });
+
+      // 4. Link Categories
+      if (categoryIds && categoryIds.length > 0) {
+        // Need to import articleCategories from schema
+        const { articleCategories } = await import('../../db/schema/index.js');
+        await tx.insert(articleCategories).values(
+          categoryIds.map(categoryId => ({
+            articleId: newArticle.id,
+            categoryId
+          }))
+        );
+      }
 
       return newArticle;
     });

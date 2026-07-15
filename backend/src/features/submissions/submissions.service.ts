@@ -47,6 +47,19 @@ export class SubmissionsService {
       }
     }
 
+    let categoryIds: string[] = [];
+    if (data.categoryIds) {
+      try {
+        categoryIds = JSON.parse(data.categoryIds);
+      } catch (e) {
+        if (typeof data.categoryIds === 'string') {
+          categoryIds = [data.categoryIds];
+        } else if (Array.isArray(data.categoryIds)) {
+          categoryIds = data.categoryIds;
+        }
+      }
+    }
+
     return await submissionsRepository.createSubmission(
       submitterId,
       data.title,
@@ -56,7 +69,8 @@ export class SubmissionsService {
       fileUrl,
       file.originalname,
       data.additionalAuthors,
-      coverImageUrl
+      coverImageUrl,
+      categoryIds
     );
   }
 
