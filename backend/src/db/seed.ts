@@ -81,9 +81,37 @@ async function main() {
 
     console.log('Inserting Categories...');
     await db.insert(schema.categories).values([
-      { name: 'Computer Science' },
-      { name: 'Physics' },
-      { name: 'Mathematics' },
+      { name: 'Alpha Amylase, Bacillus Subtilis' },
+      { name: 'Antimicrobial Resistance' },
+      { name: 'Biochemistry' },
+      { name: 'Biodiesel' },
+      { name: 'Biopolymer' },
+      { name: 'Biotechnology' },
+      { name: 'Caesarean Section' },
+      { name: 'Environment' },
+      { name: 'Enzyme Characterization' },
+      { name: 'Enzyme Production' },
+      { name: 'Folic acid' },
+      { name: 'Global Deficiency Anemia' },
+      { name: 'Health' },
+      { name: 'Heart Disesse' },
+      { name: 'Hepatitis C Virus' },
+      { name: 'Hepatocellular Carcinoma (HCC)' },
+      { name: 'Homocysteine' },
+      { name: 'industrial application' },
+      { name: 'Infectious Diseases' },
+      { name: 'Keratin' },
+      { name: 'Molecular Biology' },
+      { name: 'Neuropharmacology' },
+      { name: 'Nutrition and Physical Activity' },
+      { name: 'Pharmacognosy' },
+      { name: 'Physical Therapy' },
+      { name: 'Physiotherapist' },
+      { name: 'Proteolytic Microorganisms' },
+      { name: 'Proteomics' },
+      { name: 'Thalassemia' },
+      { name: 'Uncategorized' },
+      { name: 'Wong-Baker Faces Scale' }
     ]);
 
     console.log('Inserting Submissions (Draft/Submitted)...');

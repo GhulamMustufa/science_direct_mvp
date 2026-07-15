@@ -71,6 +71,13 @@
       "when": 1784071791411,
       "tag": "0009_bumpy_living_mummy",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1784136588779,
+      "tag": "0010_milky_king_cobra",
+      "breakpoints": true
     }
   ]
 }
