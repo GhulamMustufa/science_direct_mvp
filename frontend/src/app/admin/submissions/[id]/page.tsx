@@ -158,7 +158,7 @@ export default function AdminSubmissionDetailsPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
   // We added a static /uploads route in express that sits at http://localhost:3001/uploads
   const baseUrl = apiUrl.replace('/api', '');
-  const downloadLink = submission.pdfUrl ? `${baseUrl}${submission.pdfUrl}` : null;
+  const downloadLink = submission.pdfUrl ? (submission.pdfUrl.startsWith('http') ? submission.pdfUrl : `${baseUrl}${submission.pdfUrl}`) : null;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
