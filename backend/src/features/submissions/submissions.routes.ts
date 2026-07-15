@@ -3,6 +3,7 @@ import { authenticate } from '../../middleware/authenticate.js';
 import multer from 'multer';
 import { submitArticle, getMySubmissions, uploadRevision, validateArticle, validateRevision } from './submissions.controller.js';
 import path from 'path';
+import os from 'os';
 
 const router = Router();
 
@@ -10,7 +11,7 @@ const router = Router();
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // In a real app, ensure this directory exists
-    cb(null, path.join(process.cwd(), 'uploads'));
+    cb(null, os.tmpdir());
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
