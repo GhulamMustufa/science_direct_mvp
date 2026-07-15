@@ -79,6 +79,12 @@ async function main() {
       issn: '8765-4321',
     }).returning();
 
+    const [journal3] = await db.insert(schema.journals).values({
+      title: 'Global Journal of Medical Sciences',
+      description: 'Covers recent advancements in medical research, clinical studies, and health sciences.',
+      issn: '9988-7766',
+    }).returning();
+
     console.log('Inserting Categories...');
     await db.insert(schema.categories).values([
       { name: 'Alpha Amylase, Bacillus Subtilis' },
@@ -133,6 +139,15 @@ async function main() {
       pdfUrl: null,
     });
 
+    await db.insert(schema.articles).values({
+      submitterId: authorUser.id,
+      journalId: journal3.id,
+      title: 'Advancements in Hepatitis C Treatment',
+      abstract: 'Recent clinical trials demonstrate the efficacy of a newly synthesized antiviral compound.',
+      status: 'SUBMITTED',
+      pdfUrl: null,
+    });
+
     console.log('Inserting Published Articles...');
     await db.insert(schema.articles).values({
       submitterId: authorUser.id,
@@ -145,6 +160,32 @@ async function main() {
       publishedAt: new Date(),
       views: 150,
       downloads: 45,
+    });
+
+    await db.insert(schema.articles).values({
+      submitterId: authorUser.id,
+      journalId: journal2.id,
+      title: 'The Role of Dark Matter in Galaxy Formation',
+      abstract: 'We present new observational evidence supporting the dominant role of dark matter halos in early galaxy formation.',
+      status: 'PUBLISHED',
+      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      doi: '10.1234/ijtp.2026.042',
+      publishedAt: new Date(),
+      views: 340,
+      downloads: 120,
+    });
+
+    await db.insert(schema.articles).values({
+      submitterId: authorUser.id,
+      journalId: journal3.id,
+      title: 'Proteomics in Cancer Research: A Decade in Review',
+      abstract: 'A comprehensive review of the last ten years of discoveries in cancer proteomics.',
+      status: 'PUBLISHED',
+      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      doi: '10.1234/gjms.2026.088',
+      publishedAt: new Date(),
+      views: 520,
+      downloads: 200,
     });
 
     console.log('Seed completed successfully!');
