@@ -10,7 +10,8 @@ export class RequiredSectionsValidator implements Validator<string[] | undefined
       { name: 'Introduction', regex: /introduction/i },
       { name: 'Methods/Methodology', regex: /(methods|methodology)/i },
       { name: 'Results', regex: /results/i },
-      { name: 'Discussion', regex: /discussion/i }
+      { name: 'Discussion', regex: /discussion/i },
+      { name: 'Conclusions', regex: /conclusion/i }
     ];
 
     for (const term of requiredTerms) {

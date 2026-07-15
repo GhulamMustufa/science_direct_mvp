@@ -2,7 +2,11 @@ import { z } from 'zod';
 import { Validator } from '../Validator.js';
 import { ValidationResult } from '../ValidationResult.js';
 
-const abstractSchema = z.string().min(10, "Abstract must be at least 10 characters").max(4000, "Abstract cannot exceed 4000 characters");
+const abstractSchema = z.string()
+  .min(10, "Abstract must be at least 10 characters")
+  .refine(val => val.trim().split(/\\s+/).length <= 250, {
+    message: "Abstract cannot exceed 250 words",
+  });
 
 export class AbstractValidator implements Validator<string | undefined> {
   validate(abstract: string | undefined): ValidationResult {

@@ -4,7 +4,7 @@ import { ValidationResult } from '../ValidationResult.js';
 
 const keywordSchema = z.array(z.string())
   .min(3, "At least 3 keywords are required")
-  .max(10, "No more than 10 keywords are allowed");
+  .max(5, "No more than 5 keywords are allowed");
 
 export class KeywordValidator implements Validator<string[] | undefined> {
   validate(keywords: string[] | undefined): ValidationResult {
