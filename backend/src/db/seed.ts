@@ -86,7 +86,7 @@ async function main() {
     }).returning();
 
     console.log('Inserting Categories...');
-    await db.insert(schema.categories).values([
+    const insertedCategories = await db.insert(schema.categories).values([
       { name: 'Alpha Amylase, Bacillus Subtilis' },
       { name: 'Antimicrobial Resistance' },
       { name: 'Biochemistry' },
@@ -118,38 +118,38 @@ async function main() {
       { name: 'Thalassemia' },
       { name: 'Uncategorized' },
       { name: 'Wong-Baker Faces Scale' }
-    ]);
+    ]).returning();
 
     console.log('Inserting Submissions (Draft/Submitted)...');
-    await db.insert(schema.articles).values({
+    const [art1] = await db.insert(schema.articles).values({
       submitterId: authorUser.id,
       journalId: journal1.id,
       title: 'A Novel Approach to Machine Learning Optimization',
       abstract: 'This paper introduces a new optimization technique for deep neural networks that significantly reduces training time.',
       status: 'SUBMITTED',
       pdfUrl: null,
-    });
+    }).returning();
     
-    await db.insert(schema.articles).values({
+    const [art2] = await db.insert(schema.articles).values({
       submitterId: authorUser.id,
       journalId: journal2.id,
       title: 'Quantum Entanglement in Macroscopic Systems',
       abstract: 'We explore the theoretical possibilities of maintaining quantum entanglement at macroscopic scales.',
       status: 'DRAFT',
       pdfUrl: null,
-    });
+    }).returning();
 
-    await db.insert(schema.articles).values({
+    const [art3] = await db.insert(schema.articles).values({
       submitterId: authorUser.id,
       journalId: journal3.id,
       title: 'Advancements in Hepatitis C Treatment',
       abstract: 'Recent clinical trials demonstrate the efficacy of a newly synthesized antiviral compound.',
       status: 'SUBMITTED',
       pdfUrl: null,
-    });
+    }).returning();
 
     console.log('Inserting Published Articles...');
-    await db.insert(schema.articles).values({
+    const [art4] = await db.insert(schema.articles).values({
       submitterId: authorUser.id,
       journalId: journal1.id,
       title: 'Distributed Consensus Algorithms for Blockchain',
@@ -160,9 +160,9 @@ async function main() {
       publishedAt: new Date(),
       views: 150,
       downloads: 45,
-    });
+    }).returning();
 
-    await db.insert(schema.articles).values({
+    const [art5] = await db.insert(schema.articles).values({
       submitterId: authorUser.id,
       journalId: journal2.id,
       title: 'The Role of Dark Matter in Galaxy Formation',
@@ -173,9 +173,9 @@ async function main() {
       publishedAt: new Date(),
       views: 340,
       downloads: 120,
-    });
+    }).returning();
 
-    await db.insert(schema.articles).values({
+    const [art6] = await db.insert(schema.articles).values({
       submitterId: authorUser.id,
       journalId: journal3.id,
       title: 'Proteomics in Cancer Research: A Decade in Review',
@@ -186,7 +186,17 @@ async function main() {
       publishedAt: new Date(),
       views: 520,
       downloads: 200,
-    });
+    }).returning();
+
+    console.log('Linking Articles with Categories...');
+    await db.insert(schema.articleCategories).values([
+      { articleId: art1.id, categoryId: insertedCategories[17].id }, // ML -> industrial application
+      { articleId: art2.id, categoryId: insertedCategories[20].id }, // Quantum -> Molecular Biology (placeholder)
+      { articleId: art3.id, categoryId: insertedCategories[14].id }, // Hep C -> Hepatitis C Virus
+      { articleId: art4.id, categoryId: insertedCategories[17].id }, // Blockchain -> industrial application
+      { articleId: art5.id, categoryId: insertedCategories[7].id },  // Dark Matter -> Environment
+      { articleId: art6.id, categoryId: insertedCategories[27].id }  // Proteomics -> Proteomics
+    ]);
 
     console.log('Seed completed successfully!');
   } catch (error) {
